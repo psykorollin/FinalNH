@@ -721,6 +721,45 @@ function renderBm() {
   bmCtl.querySelector('.bm-btn').onclick = e => { e.stopPropagation(); bmCtl.classList.toggle('open'); renderBm(); };
   bmCtl.querySelectorAll('.bm-opt').forEach(b => b.onclick = e => { e.stopPropagation(); setBasemap(b.dataset.bm); });
 }
+// ---- ถนนกว้างตามจริง ----
+// แผนที่ฐานวาดถนนกว้างเป็นพิกเซลคงที่ ซูมเข้าแล้วถนนจึงแคบกว่าของจริงในภาพดาวเทียม ตรงนี้เปลี่ยนเป็นความกว้างเป็นเมตร
+// ประมาณจากประเภทถนนและทางเดียว/สองทาง (OSM มักแยกถนนใหญ่ในกรุงเทพฯ เป็นสองเส้นตามฝั่ง แต่ละเส้นจึงกว้างแค่ครึ่งถนน)
+// ตอนซูมไกลยังใช้ความกว้างเดิมของสไตล์ ให้ถนนเล็กยังมองเห็นได้
+const ONEWAY = ['!=', ['coalesce', ['get', 'oneway'], 0], 0];
+const ROAD_M = ['case', ['==', ['coalesce', ['get', 'ramp'], 0], 1], 6.5,
+  ['match', ['get', 'class'],
+    'motorway', ['case', ONEWAY, 11, 22],
+    ['trunk', 'primary'], ['case', ONEWAY, 10.5, 19],
+    'secondary', ['case', ONEWAY, 7.5, 13],
+    'tertiary', ['case', ONEWAY, 6.5, 10],
+    ['minor', 'street', 'street_limited'], 6,
+    'service', 4, 'track', 3, 0]];
+const MPP0 = 40075016.686 * Math.cos(13.75 * Math.PI / 180) / 512;  // เมตรต่อพิกเซลที่ซูม 0 ละติจูดกรุงเทพฯ
+// ค่าความกว้างเดิมที่ซูม z (รองรับตัวเลข และ interpolate ตามซูมที่มีค่าเป็นตัวเลข)
+function zoomVal(e, z) {
+  if (typeof e === 'number') return e;
+  if (!Array.isArray(e) || e[0] !== 'interpolate' || e[2]?.[0] !== 'zoom') return null;
+  const base = e[1][0] === 'exponential' ? e[1][1] : 1, st = e.slice(3);
+  if (st.some(v => typeof v !== 'number')) return null;
+  if (z <= st[0]) return st[1];
+  for (let i = 2; i < st.length; i += 2) if (z <= st[i]) {
+    const [z0, v0, z1, v1] = [st[i - 2], st[i - 1], st[i], st[i + 1]];
+    const t = base === 1 ? (z - z0) / (z1 - z0) : (base ** (z - z0) - 1) / (base ** (z1 - z0) - 1);
+    return v0 + t * (v1 - v0);
+  }
+  return st[st.length - 1];
+}
+function realRoadWidth(l) {
+  if (l.type !== 'line' || l['source-layer'] !== 'transportation' || /tunnel|rail|path|pedestrian|pier|subtle/.test(l.id)) return null;
+  const w = l.paint?.['line-width'], casing = /casing/.test(l.id);
+  const out = ['interpolate', ['exponential', 2], ['zoom']];
+  for (let z = 4; z <= 22; z++) {
+    const old = zoomVal(w, z);
+    if (old === null) return null;
+    out.push(z, z < 13 ? old : ['max', old, ['+', ['*', ROAD_M, 2 ** z / MPP0], casing ? 2 : 0]]);
+  }
+  return out;
+}
 let bmFirstSymbol;
 // เพิ่มชั้นของสไตล์เวกเตอร์ (ซ่อนไว้ก่อน) ใช้ source/sprite/ฟอนต์เดียวกับแผนที่เรียบ ไม่เอาอาคาร 3 มิติของสไตล์ เพราะมีของเราแล้ว
 async function addVectorBasemap(id) {
@@ -732,7 +771,8 @@ async function addVectorBasemap(id) {
   for (const l of st.layers) {
     if (l.type === 'fill-extrusion') continue;
     if (l.source && !map.getSource(l.source)) map.addSource(l.source, st.sources[l.source]);
-    const lid = `bm-${id}-${l.id}`;
+    const lid = `bm-${id}-${l.id}`, rw = realRoadWidth(l);
+    if (rw) l.paint = { ...l.paint, 'line-width': rw };
     map.addLayer({ ...l, id: lid, layout: { ...(l.layout || {}), visibility: 'none' } }, l.type === 'symbol' ? bmFirstSymbol : baseLayers[0].id);
     b.layers.push({ id: lid, vis: l.layout?.visibility || 'visible' });
   }
@@ -793,6 +833,7 @@ map.on('load', async () => {
   const firstSymbol = style.layers.find(l => l.type === 'symbol')?.id;
   baseLayers = style.layers.map(l => ({ id: l.id, type: l.type, vis: l.layout?.visibility || 'visible' }));
   bmFirstSymbol = firstSymbol;
+  style.layers.forEach(l => { const rw = realRoadWidth(l); if (rw) map.setPaintProperty(l.id, 'line-width', rw); });
   setBasemap(basemap);
   const font = style.layers.find(l => l.type === 'symbol' && l.layout?.['text-font'])?.layout['text-font'] || ['Noto Sans Regular'];
   map.addSource('ss-img', { type: 'image', url: 'vlm.png', coordinates: meta.image });
