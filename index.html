@@ -172,6 +172,7 @@
   .maplibregl-ctrl-group .bm-pop button.bm-opt:hover { background: var(--wash); }
   .maplibregl-ctrl-group .bm-pop button.bm-opt[aria-pressed="true"] { background: var(--wash); font-weight: 600; }
   .bm-opt img { width: 42px; height: 42px; border-radius: 5px; object-fit: cover; border: 1px solid var(--rule); flex: none; background: var(--wash); }
+  .bm-note { font-size: 12px; line-height: 1.45; color: var(--muted); margin: 6px 4px 2px; }
   .bm-opt[aria-pressed="true"] img { outline: 2px solid var(--staff); outline-offset: 1px; }
 </style>
 </head>
@@ -255,7 +256,8 @@ const I18N = {
     lede: 'ดาวเทียม Sentinel-1 วัดความสูงของพื้นดินในกรุงเทพฯ สมุทรปราการ และสมุทรสาคร ราวทุก 12 วัน ตั้งแต่ เม.ย. 2564 ถึง ต.ค. 2569 พื้นที่ทรุดเร็วที่สุดอยู่ที่<b>บ้านแพ้ว ปีละ 2.3 ซม.</b> ส่วนใจกลางกรุงเทพฯ ทรุดราวปีละ 3–4 มม.',
     searchPh: 'ค้นหาที่อยู่ ถนน หรือเขต', searchBtn: 'ค้นหา', searching: 'กำลังค้นหา…', noResult: 'ไม่พบสถานที่นี้ในสามจังหวัด ลองพิมพ์ชื่อถนนหรือเขต',
     district: 'เขต/อำเภอ',
-    bmTitle: 'แผนที่ฐาน', bmNames: { light: 'แผนที่เรียบ', osm: 'OpenStreetMap', streets: 'ถนน (Esri)', sat: 'ภาพดาวเทียม (Esri)', topo: 'ภูมิประเทศ (Esri)' },
+    bmTitle: 'แผนที่ฐาน', bmNames: { light: 'แผนที่เรียบ', osm: 'OpenStreetMap', liberty: 'ถนน (OpenFreeMap)', streets: 'ถนน (Esri)', sat: 'ภาพดาวเทียม (Esri)', topo: 'ภูมิประเทศ (Esri)' },
+    bmNote: '* ใช้ข้อมูลถนนคนละชุดกับเส้นรางและอาคาร (OpenStreetMap) แนวถนนจึงอาจคลาดกัน 10–20 ม.',
     mSub: 'อัตราการทรุด', mRisk: 'ความเสี่ยง', mSlr: 'น้ำทะเล',
     scaleSlr: 'ความลึกน้ำท่วมจากทะเลช่วงน้ำขึ้นสูงประจำปี (แบบจำลองชลศาสตร์ SFINCS)',
     cYear: 'ปี', cSsp: 'ฉากทัศน์ภูมิอากาศ (IPCC AR6)', cSub: 'การทรุด', cSubY: 'ทรุดต่อ', cSubN: 'หยุดทรุดวันนี้', cDef: 'คันกั้นน้ำ', cDefY: 'มีคัน', cDefN: 'ไม่มีคัน', now: 'ปัจจุบัน',
@@ -296,7 +298,8 @@ const I18N = {
     lede: 'The Sentinel-1 satellite measured ground height in Bangkok, Samut Prakan and Samut Sakhon about every 12 days from April 2021 to October 2026. The fastest sinking is in <b>Ban Phaeo, 2.3 cm a year</b>. Central Bangkok sinks about 3–4 mm a year.',
     searchPh: 'Search an address, road or district', searchBtn: 'Search', searching: 'Searching…', noResult: 'No place found in the three provinces. Try a road or district name.',
     district: 'District',
-    bmTitle: 'Basemap', bmNames: { light: 'Plain', osm: 'OpenStreetMap', streets: 'Streets (Esri)', sat: 'Satellite (Esri)', topo: 'Topographic (Esri)' },
+    bmTitle: 'Basemap', bmNames: { light: 'Plain', osm: 'OpenStreetMap', liberty: 'Streets (OpenFreeMap)', streets: 'Streets (Esri)', sat: 'Satellite (Esri)', topo: 'Topographic (Esri)' },
+    bmNote: '* Uses a different road dataset from the rail and building layers (OpenStreetMap), so roads may sit 10–20 m off.',
     mSub: 'Sinking rate', mRisk: 'Risk', mSlr: 'Sea level',
     scaleSlr: 'Sea flooding depth during the yearly highest tide (SFINCS hydrodynamic model)',
     cYear: 'Year', cSsp: 'Climate scenario (IPCC AR6)', cSub: 'Sinking', cSubY: 'Continues', cSubN: 'Stops today', cDef: 'Flood defences', cDefY: 'With dikes', cDefN: 'No dikes', now: 'Today',
@@ -684,20 +687,26 @@ map.addControl(new maplibregl.GeolocateControl({ positionOptions: { enableHighAc
 map.addControl(new maplibregl.ScaleControl(), 'bottom-left');
 
 // ---- แผนที่ฐาน ----
-// "light" คือสไตล์เวกเตอร์ OpenFreeMap เดิม แบบอื่นเป็น raster tile ที่วางไว้ใต้ชั้นข้อมูลทั้งหมด
+// "light" คือสไตล์เวกเตอร์ OpenFreeMap เดิม, "liberty" เป็นสไตล์เวกเตอร์ที่ใช้ข้อมูล OSM ชุดเดียวกัน (โหลดเมื่อเลือก)
+// แบบอื่นเป็น raster tile ที่วางไว้ใต้ชั้นข้อมูลทั้งหมด
 const ESRI = 'https://server.arcgisonline.com/ArcGIS/rest/services/';
+const svgThumb = (bg, park, water, road, casing) => 'data:image/svg+xml,' + encodeURIComponent(
+  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 42 42"><rect width="42" height="42" fill="${bg}"/>`
+  + `<path d="M24 0h18v14H30z" fill="${park}"/><path d="M0 30c10-4 20 2 42-6v18H0z" fill="${water}"/>`
+  + `<path d="M-2 12 44 20M14-2l6 46" stroke="${casing}" stroke-width="5"/><path d="M-2 12 44 20M14-2l6 46" stroke="${road}" stroke-width="3"/></svg>`);
 const BASEMAPS = {
-  light: { thumb: 'https://a.basemaps.cartocdn.com/light_all/12/3191/1890.png' },
+  light: { thumb: svgThumb('#f2f3f0', '#e3ebde', '#cdd9e0', '#ffffff', '#dcdcdc') },
   osm: { tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'], max: 19,
     attr: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     thumb: 'https://tile.openstreetmap.org/12/3191/1890.png' },
-  streets: { tiles: [ESRI + 'World_Street_Map/MapServer/tile/{z}/{y}/{x}'], max: 19,
+  liberty: { style: 'https://tiles.openfreemap.org/styles/liberty', thumb: svgThumb('#f8f4f0', '#cfe6b8', '#9ec7e8', '#ffd98a', '#e9a84a') },
+  streets: { tiles: [ESRI + 'World_Street_Map/MapServer/tile/{z}/{y}/{x}'], max: 19, note: true,
     attr: 'Tiles © Esri — Esri, HERE, Garmin, USGS, OpenStreetMap contributors',
     thumb: ESRI + 'World_Street_Map/MapServer/tile/12/1890/3191' },
   sat: { tiles: [ESRI + 'World_Imagery/MapServer/tile/{z}/{y}/{x}'], max: 18, labels: true,
     attr: 'Imagery © Esri — Esri, Maxar, Earthstar Geographics, GIS User Community',
     thumb: ESRI + 'World_Imagery/MapServer/tile/12/1890/3191' },
-  topo: { tiles: [ESRI + 'World_Topo_Map/MapServer/tile/{z}/{y}/{x}'], max: 19,
+  topo: { tiles: [ESRI + 'World_Topo_Map/MapServer/tile/{z}/{y}/{x}'], max: 19, note: true,
     attr: 'Tiles © Esri — Esri, HERE, Garmin, FAO, NOAA, USGS, OpenStreetMap contributors',
     thumb: ESRI + 'World_Topo_Map/MapServer/tile/12/1890/3191' },
 };
@@ -708,17 +717,36 @@ function renderBm() {
   bmCtl.innerHTML = `<button class="bm-btn" type="button" aria-haspopup="true" aria-expanded="${bmCtl.classList.contains('open')}" title="${T('bmTitle')}" aria-label="${T('bmTitle')}">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3 2 8.5 12 14l10-5.5L12 3Z"/><path d="m2 13 10 5.5L22 13"/><path d="m2 17.5 10 5.5 10-5.5" opacity=".55"/></svg></button>
     <div class="bm-pop" role="menu"><h3>${T('bmTitle')}</h3>${Object.keys(BASEMAPS).map(k =>
-      `<button class="bm-opt" type="button" role="menuitemradio" data-bm="${k}" aria-pressed="${k === basemap}"><img src="${BASEMAPS[k].thumb}" alt="" loading="lazy">${T('bmNames')[k]}</button>`).join('')}</div>`;
+      `<button class="bm-opt" type="button" role="menuitemradio" data-bm="${k}" aria-pressed="${k === basemap}"><img src="${BASEMAPS[k].thumb}" alt="" loading="lazy">${T('bmNames')[k]}${BASEMAPS[k].note ? ' *' : ''}</button>`).join('')}<p class="bm-note">${T('bmNote')}</p></div>`;
   bmCtl.querySelector('.bm-btn').onclick = e => { e.stopPropagation(); bmCtl.classList.toggle('open'); renderBm(); };
   bmCtl.querySelectorAll('.bm-opt').forEach(b => b.onclick = e => { e.stopPropagation(); setBasemap(b.dataset.bm); });
 }
-function setBasemap(id) {
+let bmFirstSymbol;
+// เพิ่มชั้นของสไตล์เวกเตอร์ (ซ่อนไว้ก่อน) ใช้ source/sprite/ฟอนต์เดียวกับแผนที่เรียบ ไม่เอาอาคาร 3 มิติของสไตล์ เพราะมีของเราแล้ว
+async function addVectorBasemap(id) {
+  const b = BASEMAPS[id];
+  if (b.layers) return;
+  const st = await fetch(b.style).then(r => r.json());
+  if (b.layers) return;
+  b.layers = [];
+  for (const l of st.layers) {
+    if (l.type === 'fill-extrusion') continue;
+    if (l.source && !map.getSource(l.source)) map.addSource(l.source, st.sources[l.source]);
+    const lid = `bm-${id}-${l.id}`;
+    map.addLayer({ ...l, id: lid, layout: { ...(l.layout || {}), visibility: 'none' } }, l.type === 'symbol' ? bmFirstSymbol : baseLayers[0].id);
+    b.layers.push({ id: lid, vis: l.layout?.visibility || 'visible' });
+  }
+}
+async function setBasemap(id) {
   if (!BASEMAPS[id]) id = 'light';
   basemap = id;
   try { localStorage.setItem('basemap', id); } catch (err) { /* ไม่มี storage ก็ใช้ได้ */ }
   renderBm();
   if (!baseLayers) return;  // แผนที่ยังโหลดไม่เสร็จ จะตั้งค่าอีกครั้งตอน load
   const b = BASEMAPS[id];
+  if (b.style) { try { await addVectorBasemap(id); } catch (err) { basemap = id = 'light'; renderBm(); } }
+  if (id !== basemap) return;  // ผู้ใช้เปลี่ยนไปแบบอื่นระหว่างโหลด
+  Object.keys(BASEMAPS).forEach(k => (BASEMAPS[k].layers || []).forEach(l => map.setLayoutProperty(l.id, 'visibility', k === id ? l.vis : 'none')));
   if (b.tiles && !map.getSource(`bm-${id}`)) {
     map.addSource(`bm-${id}`, { type: 'raster', tiles: b.tiles, tileSize: 256, maxzoom: b.max, attribution: b.attr });
     map.addLayer({ id: `bm-${id}`, type: 'raster', source: `bm-${id}` }, baseLayers[0].id);
@@ -764,6 +792,7 @@ map.on('load', async () => {
   });
   const firstSymbol = style.layers.find(l => l.type === 'symbol')?.id;
   baseLayers = style.layers.map(l => ({ id: l.id, type: l.type, vis: l.layout?.visibility || 'visible' }));
+  bmFirstSymbol = firstSymbol;
   setBasemap(basemap);
   const font = style.layers.find(l => l.type === 'symbol' && l.layout?.['text-font'])?.layout['text-font'] || ['Noto Sans Regular'];
   map.addSource('ss-img', { type: 'image', url: 'vlm.png', coordinates: meta.image });
