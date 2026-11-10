@@ -260,6 +260,7 @@ const I18N = {
     district: 'เขต/อำเภอ',
     bmTitle: 'แผนที่ฐาน', bmNames: { light: 'แผนที่เรียบ', osm: 'OpenStreetMap', liberty: 'ถนน (OpenFreeMap)', streets: 'ถนน (Esri)', sat: 'ภาพดาวเทียม (Esri)', topo: 'ภูมิประเทศ (Esri)' },
     bmRoads: 'ถนนกว้างตามขนาดจริงเมื่อซูมเข้า (แผนที่เรียบ, OpenFreeMap)',
+    bmMs: 'เส้นถนนที่ลากจากภาพถ่ายทางอากาศ (Microsoft) สีม่วง กว้างตามที่ตรวจจับได้ เห็นเมื่อซูมเข้า',
     bmNote: '* ใช้ข้อมูลถนนคนละชุดกับเส้นรางและอาคาร (OpenStreetMap) แนวถนนจึงอาจคลาดกัน 10–20 ม.',
     mSub: 'อัตราการทรุด', mRisk: 'ความเสี่ยง', mSlr: 'น้ำทะเล',
     scaleSlr: 'ความลึกน้ำท่วมจากทะเลช่วงน้ำขึ้นสูงประจำปี (แบบจำลองชลศาสตร์ SFINCS)',
@@ -303,6 +304,7 @@ const I18N = {
     district: 'District',
     bmTitle: 'Basemap', bmNames: { light: 'Plain', osm: 'OpenStreetMap', liberty: 'Streets (OpenFreeMap)', streets: 'Streets (Esri)', sat: 'Satellite (Esri)', topo: 'Topographic (Esri)' },
     bmRoads: 'Real road widths when zoomed in (Plain, OpenFreeMap)',
+    bmMs: 'Roads traced from aerial imagery (Microsoft), purple, at their detected width; shown when zoomed in',
     bmNote: '* Uses a different road dataset from the rail and building layers (OpenStreetMap), so roads may sit 10–20 m off.',
     mSub: 'Sinking rate', mRisk: 'Risk', mSlr: 'Sea level',
     scaleSlr: 'Sea flooding depth during the yearly highest tide (SFINCS hydrodynamic model)',
@@ -721,9 +723,14 @@ function renderBm() {
   bmCtl.innerHTML = `<button class="bm-btn" type="button" aria-haspopup="true" aria-expanded="${bmCtl.classList.contains('open')}" title="${T('bmTitle')}" aria-label="${T('bmTitle')}">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3 2 8.5 12 14l10-5.5L12 3Z"/><path d="m2 13 10 5.5L22 13"/><path d="m2 17.5 10 5.5 10-5.5" opacity=".55"/></svg></button>
     <div class="bm-pop" role="menu"><h3>${T('bmTitle')}</h3>${Object.keys(BASEMAPS).map(k =>
-      `<button class="bm-opt" type="button" role="menuitemradio" data-bm="${k}" aria-pressed="${k === basemap}"><img src="${BASEMAPS[k].thumb}" alt="" loading="lazy">${T('bmNames')[k]}${BASEMAPS[k].note ? ' *' : ''}</button>`).join('')}<label class="bm-road"><input type="checkbox"${realRoads ? ' checked' : ''}>${T('bmRoads')}</label><p class="bm-note">${T('bmNote')}</p></div>`;
+      `<button class="bm-opt" type="button" role="menuitemradio" data-bm="${k}" aria-pressed="${k === basemap}"><img src="${BASEMAPS[k].thumb}" alt="" loading="lazy">${T('bmNames')[k]}${BASEMAPS[k].note ? ' *' : ''}</button>`).join('')}<label class="bm-road"><input type="checkbox"${realRoads ? ' checked' : ''}>${T('bmRoads')}</label><label class="bm-road"><input type="checkbox" data-ms${msRoads ? ' checked' : ''}>${T('bmMs')}</label><p class="bm-note">${T('bmNote')}</p></div>`;
   bmCtl.querySelector('.bm-btn').onclick = e => { e.stopPropagation(); bmCtl.classList.toggle('open'); renderBm(); };
   bmCtl.querySelectorAll('.bm-opt').forEach(b => b.onclick = e => { e.stopPropagation(); setBasemap(b.dataset.bm); });
+  bmCtl.querySelector('[data-ms]').onchange = e => {
+    msRoads = e.target.checked;
+    try { localStorage.setItem('msRoads', msRoads ? '1' : '0'); } catch (err) { /* ไม่มี storage ก็ใช้ได้ */ }
+    if (map.getLayer('ms-roads')) map.setLayoutProperty('ms-roads', 'visibility', msRoads ? 'visible' : 'none');
+  };
   bmCtl.querySelector('.bm-road input').onchange = e => {
     realRoads = e.target.checked;
     try { localStorage.setItem('realRoads', realRoads ? '1' : '0'); } catch (err) { /* ไม่มี storage ก็ใช้ได้ */ }
@@ -771,8 +778,8 @@ function realRoadWidth(l) {
 }
 // ชั้นถนนที่ปรับได้ เก็บความกว้างเดิมกับความกว้างตามจริงไว้สลับกัน
 const roadLayers = [];
-let realRoads = true;
-try { realRoads = localStorage.getItem('realRoads') !== '0'; } catch (err) { /* ใช้ค่าเริ่มต้น */ }
+let realRoads = true, msRoads = false;
+try { realRoads = localStorage.getItem('realRoads') !== '0'; msRoads = localStorage.getItem('msRoads') === '1'; } catch (err) { /* ใช้ค่าเริ่มต้น */ }
 function applyRoads() {
   roadLayers.forEach(r => { if (map.getLayer(r.id)) map.setPaintProperty(r.id, 'line-width', realRoads ? r.real : r.orig); });
 }
@@ -889,6 +896,14 @@ map.on('load', async () => {
     map.addLayer({ id: `ss-bld${i}`, type: 'fill-extrusion', source: `ss-b${i}`, 'source-layer': 'buildings', minzoom: 13,
       paint: { 'fill-extrusion-color': colorExpr('c'), 'fill-extrusion-height': ['get', 'h'], 'fill-extrusion-opacity': .93 } });
   });
+  // ถนนที่ Microsoft ตรวจจับจากภาพถ่าย Bing พร้อมความกว้างโดยประมาณ (w, เมตร) ตัดเฉพาะพื้นที่ศึกษา ซูม 12–15
+  map.addSource('ms-roads', { type: 'vector', url: `pmtiles://${new URL('msroads.pmtiles', location.href)}`,
+    attribution: 'Road detections © <a href="https://github.com/microsoft/RoadDetections">Microsoft</a> (ODbL)' });
+  const msW = ['interpolate', ['exponential', 2], ['zoom']];
+  for (let z = 12; z <= 22; z++) msW.push(z, ['max', 1, ['*', ['get', 'w'], 2 ** z / MPP0]]);
+  map.addLayer({ id: 'ms-roads', type: 'line', source: 'ms-roads', 'source-layer': 'roads', minzoom: 12,
+    layout: { visibility: msRoads ? 'visible' : 'none', 'line-cap': 'round', 'line-join': 'round' },
+    paint: { 'line-color': '#8a3ffc', 'line-opacity': 0.5, 'line-width': msW } });
   map.addSource('ss-rail', { type: 'geojson', data: 'rail.geojson' });
   map.addLayer({ id: 'ss-rail-case', type: 'line', source: 'ss-rail', paint: { 'line-color': '#1b2629', 'line-width': ['interpolate', ['linear'], ['zoom'], 9, 2.6, 14, 5.5, 18, 6.5] } });
   map.addLayer({ id: 'ss-rail', type: 'line', source: 'ss-rail', paint: { 'line-color': colorExpr('c'), 'line-width': ['interpolate', ['linear'], ['zoom'], 9, 1.4, 14, 3.2, 18, 3.8] } });
