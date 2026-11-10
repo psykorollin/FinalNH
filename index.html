@@ -160,6 +160,19 @@
     #card { left: 8px; right: 8px; bottom: 8px; width: auto; max-height: 60%; }
     .num { font-size: 38px; }
   }
+  /* ตัวเลือกแผนที่ฐาน */
+  .bm-ctl { position: relative; }
+  .bm-ctl > button.bm-btn svg { width: 18px; height: 18px; display: block; margin: auto; color: #333; }
+  .bm-pop { position: absolute; right: 38px; top: 0; width: 214px; background: var(--paper); color: var(--ink);
+    border: 1px solid var(--rule); border-radius: 8px; box-shadow: var(--shadow); padding: 8px; font-family: var(--body); display: none; }
+  .bm-ctl.open .bm-pop { display: block; }
+  .bm-pop h3 { font: 600 13px var(--head); margin: 2px 4px 6px; letter-spacing: .02em; }
+  .maplibregl-ctrl-group .bm-pop button.bm-opt { display: flex; align-items: center; gap: 9px; width: 100%; height: auto;
+    padding: 5px 6px; border: 0; background: none; color: inherit; font: 14px var(--body); text-align: left; cursor: pointer; border-radius: 6px; }
+  .maplibregl-ctrl-group .bm-pop button.bm-opt:hover { background: var(--wash); }
+  .maplibregl-ctrl-group .bm-pop button.bm-opt[aria-pressed="true"] { background: var(--wash); font-weight: 600; }
+  .bm-opt img { width: 42px; height: 42px; border-radius: 5px; object-fit: cover; border: 1px solid var(--rule); flex: none; background: var(--wash); }
+  .bm-opt[aria-pressed="true"] img { outline: 2px solid var(--staff); outline-offset: 1px; }
 </style>
 </head>
 <body>
@@ -242,6 +255,7 @@ const I18N = {
     lede: 'ดาวเทียม Sentinel-1 วัดความสูงของพื้นดินในกรุงเทพฯ สมุทรปราการ และสมุทรสาคร ราวทุก 12 วัน ตั้งแต่ เม.ย. 2564 ถึง ต.ค. 2569 พื้นที่ทรุดเร็วที่สุดอยู่ที่<b>บ้านแพ้ว ปีละ 2.3 ซม.</b> ส่วนใจกลางกรุงเทพฯ ทรุดราวปีละ 3–4 มม.',
     searchPh: 'ค้นหาที่อยู่ ถนน หรือเขต', searchBtn: 'ค้นหา', searching: 'กำลังค้นหา…', noResult: 'ไม่พบสถานที่นี้ในสามจังหวัด ลองพิมพ์ชื่อถนนหรือเขต',
     district: 'เขต/อำเภอ',
+    bmTitle: 'แผนที่ฐาน', bmNames: { light: 'แผนที่เรียบ', osm: 'OpenStreetMap', streets: 'ถนน (Esri)', sat: 'ภาพดาวเทียม (Esri)', topo: 'ภูมิประเทศ (Esri)' },
     mSub: 'อัตราการทรุด', mRisk: 'ความเสี่ยง', mSlr: 'น้ำทะเล',
     scaleSlr: 'ความลึกน้ำท่วมจากทะเลช่วงน้ำขึ้นสูงประจำปี (แบบจำลองชลศาสตร์ SFINCS)',
     cYear: 'ปี', cSsp: 'ฉากทัศน์ภูมิอากาศ (IPCC AR6)', cSub: 'การทรุด', cSubY: 'ทรุดต่อ', cSubN: 'หยุดทรุดวันนี้', cDef: 'คันกั้นน้ำ', cDefY: 'มีคัน', cDefN: 'ไม่มีคัน', now: 'ปัจจุบัน',
@@ -282,6 +296,7 @@ const I18N = {
     lede: 'The Sentinel-1 satellite measured ground height in Bangkok, Samut Prakan and Samut Sakhon about every 12 days from April 2021 to October 2026. The fastest sinking is in <b>Ban Phaeo, 2.3 cm a year</b>. Central Bangkok sinks about 3–4 mm a year.',
     searchPh: 'Search an address, road or district', searchBtn: 'Search', searching: 'Searching…', noResult: 'No place found in the three provinces. Try a road or district name.',
     district: 'District',
+    bmTitle: 'Basemap', bmNames: { light: 'Plain', osm: 'OpenStreetMap', streets: 'Streets (Esri)', sat: 'Satellite (Esri)', topo: 'Topographic (Esri)' },
     mSub: 'Sinking rate', mRisk: 'Risk', mSlr: 'Sea level',
     scaleSlr: 'Sea flooding depth during the yearly highest tide (SFINCS hydrodynamic model)',
     cYear: 'Year', cSsp: 'Climate scenario (IPCC AR6)', cSub: 'Sinking', cSubY: 'Continues', cSubN: 'Stops today', cDef: 'Flood defences', cDefY: 'With dikes', cDefN: 'No dikes', now: 'Today',
@@ -667,6 +682,58 @@ const map = new maplibregl.Map({
 map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), 'top-right');
 map.addControl(new maplibregl.GeolocateControl({ positionOptions: { enableHighAccuracy: true }, trackUserLocation: false }), 'top-right');
 map.addControl(new maplibregl.ScaleControl(), 'bottom-left');
+
+// ---- แผนที่ฐาน ----
+// "light" คือสไตล์เวกเตอร์ OpenFreeMap เดิม แบบอื่นเป็น raster tile ที่วางไว้ใต้ชั้นข้อมูลทั้งหมด
+const ESRI = 'https://server.arcgisonline.com/ArcGIS/rest/services/';
+const BASEMAPS = {
+  light: { thumb: 'https://a.basemaps.cartocdn.com/light_all/12/3191/1890.png' },
+  osm: { tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'], max: 19,
+    attr: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    thumb: 'https://tile.openstreetmap.org/12/3191/1890.png' },
+  streets: { tiles: [ESRI + 'World_Street_Map/MapServer/tile/{z}/{y}/{x}'], max: 19,
+    attr: 'Tiles © Esri — Esri, HERE, Garmin, USGS, OpenStreetMap contributors',
+    thumb: ESRI + 'World_Street_Map/MapServer/tile/12/1890/3191' },
+  sat: { tiles: [ESRI + 'World_Imagery/MapServer/tile/{z}/{y}/{x}'], max: 18, labels: true,
+    attr: 'Imagery © Esri — Esri, Maxar, Earthstar Geographics, GIS User Community',
+    thumb: ESRI + 'World_Imagery/MapServer/tile/12/1890/3191' },
+  topo: { tiles: [ESRI + 'World_Topo_Map/MapServer/tile/{z}/{y}/{x}'], max: 19,
+    attr: 'Tiles © Esri — Esri, HERE, Garmin, FAO, NOAA, USGS, OpenStreetMap contributors',
+    thumb: ESRI + 'World_Topo_Map/MapServer/tile/12/1890/3191' },
+};
+let basemap = 'light', baseLayers = null;
+const bmCtl = document.createElement('div');
+bmCtl.className = 'maplibregl-ctrl maplibregl-ctrl-group bm-ctl';
+function renderBm() {
+  bmCtl.innerHTML = `<button class="bm-btn" type="button" aria-haspopup="true" aria-expanded="${bmCtl.classList.contains('open')}" title="${T('bmTitle')}" aria-label="${T('bmTitle')}">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3 2 8.5 12 14l10-5.5L12 3Z"/><path d="m2 13 10 5.5L22 13"/><path d="m2 17.5 10 5.5 10-5.5" opacity=".55"/></svg></button>
+    <div class="bm-pop" role="menu"><h3>${T('bmTitle')}</h3>${Object.keys(BASEMAPS).map(k =>
+      `<button class="bm-opt" type="button" role="menuitemradio" data-bm="${k}" aria-pressed="${k === basemap}"><img src="${BASEMAPS[k].thumb}" alt="" loading="lazy">${T('bmNames')[k]}</button>`).join('')}</div>`;
+  bmCtl.querySelector('.bm-btn').onclick = e => { e.stopPropagation(); bmCtl.classList.toggle('open'); renderBm(); };
+  bmCtl.querySelectorAll('.bm-opt').forEach(b => b.onclick = e => { e.stopPropagation(); setBasemap(b.dataset.bm); });
+}
+function setBasemap(id) {
+  if (!BASEMAPS[id]) id = 'light';
+  basemap = id;
+  try { localStorage.setItem('basemap', id); } catch (err) { /* ไม่มี storage ก็ใช้ได้ */ }
+  renderBm();
+  if (!baseLayers) return;  // แผนที่ยังโหลดไม่เสร็จ จะตั้งค่าอีกครั้งตอน load
+  const b = BASEMAPS[id];
+  if (b.tiles && !map.getSource(`bm-${id}`)) {
+    map.addSource(`bm-${id}`, { type: 'raster', tiles: b.tiles, tileSize: 256, maxzoom: b.max, attribution: b.attr });
+    map.addLayer({ id: `bm-${id}`, type: 'raster', source: `bm-${id}` }, baseLayers[0].id);
+  }
+  Object.keys(BASEMAPS).forEach(k => { if (map.getLayer(`bm-${k}`)) map.setLayoutProperty(`bm-${k}`, 'visibility', k === id ? 'visible' : 'none'); });
+  // สไตล์เวกเตอร์เดิม: เปิดทั้งหมดเมื่อเลือกแผนที่เรียบ, บนภาพดาวเทียมเหลือเฉพาะป้ายชื่อ, แบบอื่นปิดทั้งหมด
+  baseLayers.forEach(l => {
+    const on = id === 'light' || (b.labels && l.type === 'symbol');
+    map.setLayoutProperty(l.id, 'visibility', on ? l.vis : 'none');
+  });
+}
+map.addControl({ onAdd: () => bmCtl, onRemove: () => bmCtl.remove() }, 'top-right');
+document.addEventListener('click', e => { if (!bmCtl.contains(e.target) && bmCtl.classList.contains('open')) { bmCtl.classList.remove('open'); renderBm(); } });
+try { basemap = localStorage.getItem('basemap') || 'light'; } catch (err) { /* ใช้ค่าเริ่มต้น */ }
+renderBm();
 const labelExpr = () => ['concat', ['get', lang === 'th' ? 'adm2_name1' : 'adm2_name'], '\n', ['number-format', ['abs', ['get', 'med']], { 'max-fraction-digits': 0 }], lang === 'th' ? ' มม.' : ' mm'];
 
 function setMode(m) {
@@ -696,6 +763,8 @@ map.on('load', async () => {
       map.setPaintProperty(l.id, 'text-color', '#3c4a4e'); } catch (err) { /* layer has no text */ }
   });
   const firstSymbol = style.layers.find(l => l.type === 'symbol')?.id;
+  baseLayers = style.layers.map(l => ({ id: l.id, type: l.type, vis: l.layout?.visibility || 'visible' }));
+  setBasemap(basemap);
   const font = style.layers.find(l => l.type === 'symbol' && l.layout?.['text-font'])?.layout['text-font'] || ['Noto Sans Regular'];
   map.addSource('ss-img', { type: 'image', url: 'vlm.png', coordinates: meta.image });
   map.addLayer({ id: 'ss-img', type: 'raster', source: 'ss-img',
@@ -731,8 +800,8 @@ map.on('load', async () => {
       paint: { 'fill-extrusion-color': colorExpr('c'), 'fill-extrusion-height': ['get', 'h'], 'fill-extrusion-opacity': .93 } });
   });
   map.addSource('ss-rail', { type: 'geojson', data: 'rail.geojson' });
-  map.addLayer({ id: 'ss-rail-case', type: 'line', source: 'ss-rail', paint: { 'line-color': '#1b2629', 'line-width': ['interpolate', ['linear'], ['zoom'], 9, 2.6, 15, 8] } });
-  map.addLayer({ id: 'ss-rail', type: 'line', source: 'ss-rail', paint: { 'line-color': colorExpr('c'), 'line-width': ['interpolate', ['linear'], ['zoom'], 9, 1.4, 15, 5] } });
+  map.addLayer({ id: 'ss-rail-case', type: 'line', source: 'ss-rail', paint: { 'line-color': '#1b2629', 'line-width': ['interpolate', ['linear'], ['zoom'], 9, 2.6, 14, 5.5, 18, 6.5] } });
+  map.addLayer({ id: 'ss-rail', type: 'line', source: 'ss-rail', paint: { 'line-color': colorExpr('c'), 'line-width': ['interpolate', ['linear'], ['zoom'], 9, 1.4, 14, 3.2, 18, 3.8] } });
   // ป้าย 6 เขตที่ทรุดเร็วที่สุด เขียนลงบนแผนที่ตรง ๆ
   map.addLayer({ id: 'ss-lab', type: 'symbol', source: 'ss-dist', maxzoom: 12.5, filter: ['<=', ['get', 'rank'], 6],
     layout: { 'text-field': labelExpr(), 'text-font': font, 'text-size': 13, 'text-line-height': 1.25, 'text-padding': 4 },
@@ -776,7 +845,7 @@ map.on('load', async () => {
 });
 
 map.on('zoomend', () => { if (map.getZoom() >= 13 && map.getPitch() < 20) map.easeTo({ pitch: 50, duration: 600 }); });
-$('lang').onclick = () => { lang = lang === 'th' ? 'en' : 'th'; applyLang(); };
+$('lang').onclick = () => { lang = lang === 'th' ? 'en' : 'th'; applyLang(); renderBm(); };
 $('aboutBtn').onclick = () => $('about').classList.add('open');
 $('about').onclick = e => { if (e.target.id === 'about') $('about').classList.remove('open'); };
 $('cardClose').onclick = () => { $('card').classList.remove('open'); last = null; marker?.remove(); };
