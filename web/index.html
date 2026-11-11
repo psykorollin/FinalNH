@@ -262,10 +262,10 @@ const I18N = {
     searchPh: 'ค้นหาที่อยู่ ถนน หรือเขต', searchBtn: 'ค้นหา', searching: 'กำลังค้นหา…', noResult: 'ไม่พบสถานที่นี้ในสามจังหวัด ลองพิมพ์ชื่อถนนหรือเขต',
     district: 'เขต/อำเภอ',
     bmTitle: 'แผนที่ฐาน', bmNames: { light: 'แผนที่เรียบ', osm: 'OpenStreetMap', liberty: 'ถนน (OpenFreeMap)', streets: 'ถนน (Esri)', sat: 'ภาพดาวเทียม (Esri)', topo: 'ภูมิประเทศ (Esri)' },
-    bmRoads: 'ถนนกว้างตามขนาดจริงเมื่อซูมเข้า (แผนที่เรียบ, OpenFreeMap)',
+    bmRoads: 'ถนนกว้างตามขนาดจริงเมื่อซูมเข้า แต่ละเส้นตามจำนวนช่องจราจรหรือภาพถ่าย (แผนที่เรียบ, OpenFreeMap)',
     cmpTitle: 'เทียบถนนจากหลายแหล่ง',
     cmpHint: 'เปิดหลายชั้นซ้อนบนภาพดาวเทียม จะเห็นว่าแต่ละแหล่งคลาดกันแค่ไหน (เห็นเมื่อซูมเข้า)',
-    cmpNames: { osm: 'OpenStreetMap: อาสาสมัครวาด', ovt: 'Overture: OSM + TomTom (ส่วนของ TomTom เป็นสีแดง)',
+    cmpNames: { osm: 'OpenStreetMap: อาสาสมัครวาด แถบจาง = ความกว้างที่ประมาณ', ovt: 'Overture: OSM + TomTom (ส่วนของ TomTom เป็นสีแดง)',
       ms: 'Microsoft: AI ลากจากภาพถ่าย Bing แถบจาง = ความกว้างที่ตรวจจับได้', esri: 'Esri: ข้อมูล HERE/Garmin (เป็นภาพ)' },
     bmNote: '* ใช้ข้อมูลถนนคนละชุดกับเส้นรางและอาคาร (OpenStreetMap) แนวถนนจึงอาจคลาดกัน 10–20 ม.',
     mSub: 'อัตราการทรุด', mRisk: 'ความเสี่ยง', mSlr: 'น้ำทะเล',
@@ -313,10 +313,10 @@ const I18N = {
     searchPh: 'Search an address, road or district', searchBtn: 'Search', searching: 'Searching…', noResult: 'No place found in the three provinces. Try a road or district name.',
     district: 'District',
     bmTitle: 'Basemap', bmNames: { light: 'Plain', osm: 'OpenStreetMap', liberty: 'Streets (OpenFreeMap)', streets: 'Streets (Esri)', sat: 'Satellite (Esri)', topo: 'Topographic (Esri)' },
-    bmRoads: 'Real road widths when zoomed in (Plain, OpenFreeMap)',
+    bmRoads: 'Real road widths when zoomed in, per road from lane counts or imagery (Plain, OpenFreeMap)',
     cmpTitle: 'Compare road sources',
     cmpHint: 'Turn several on over the satellite map to see how far the sources disagree (shown when zoomed in).',
-    cmpNames: { osm: 'OpenStreetMap: drawn by volunteers', ovt: 'Overture: OSM + TomTom (TomTom parts in red)',
+    cmpNames: { osm: 'OpenStreetMap: drawn by volunteers; pale band = estimated width', ovt: 'Overture: OSM + TomTom (TomTom parts in red)',
       ms: 'Microsoft: AI-traced from Bing imagery; pale band = detected width', esri: 'Esri: HERE/Garmin data (image)' },
     bmNote: '* Uses a different road dataset from the rail and building layers (OpenStreetMap), so roads may sit 10–20 m off.',
     mSub: 'Sinking rate', mRisk: 'Risk', mSlr: 'Sea level',
@@ -786,51 +786,34 @@ function renderBm() {
   };
 }
 // ---- ถนนกว้างตามจริง ----
-// แผนที่ฐานวาดถนนกว้างเป็นพิกเซลคงที่ ซูมเข้าแล้วถนนจึงแคบกว่าของจริงในภาพดาวเทียม ตรงนี้เปลี่ยนเป็นความกว้างเป็นเมตร
-// ประมาณจากประเภทถนนและทางเดียว/สองทาง (OSM มักแยกถนนใหญ่ในกรุงเทพฯ เป็นสองเส้นตามฝั่ง แต่ละเส้นจึงกว้างแค่ครึ่งถนน)
-// ตอนซูมไกลยังใช้ความกว้างเดิมของสไตล์ ให้ถนนเล็กยังมองเห็นได้
-const ONEWAY = ['!=', ['coalesce', ['get', 'oneway'], 0], 0];
-const ROAD_M = ['case', ['==', ['coalesce', ['get', 'ramp'], 0], 1], 6.5,
-  ['match', ['get', 'class'],
-    'motorway', ['case', ONEWAY, 11, 22],
-    ['trunk', 'primary'], ['case', ONEWAY, 10.5, 19],
-    'secondary', ['case', ONEWAY, 7.5, 13],
-    'tertiary', ['case', ONEWAY, 6.5, 10],
-    ['minor', 'street', 'street_limited'], 6,
-    'service', 4, 'track', 3, 0]];
+// แผนที่ฐานวาดถนนกว้างเป็นพิกเซลคงที่ ซูมเข้าแล้วถนนจึงแคบหรือกว้างกว่าของจริงในภาพดาวเทียม
+// ตั้งแต่ซูม 14 จึงซ่อนถนนของแผนที่ฐาน แล้ววาดถนน OSM ของเราเอง (osmroads.pmtiles) ที่รู้ความกว้างเป็นเมตรของแต่ละเส้น
+// (จากแทก width หรือจำนวนช่องจราจรใน OSM ถ้าไม่มีใช้ความกว้างที่ Microsoft ตรวจจับจากภาพถ่าย สุดท้ายจึงใช้ค่าตามประเภทถนน)
 const MPP0 = 40075016.686 * Math.cos(13.75 * Math.PI / 180) / 512;  // เมตรต่อพิกเซลที่ซูม 0 ละติจูดกรุงเทพฯ
-// ค่าความกว้างเดิมที่ซูม z (รองรับตัวเลข และ interpolate ตามซูมที่มีค่าเป็นตัวเลข)
-function zoomVal(e, z) {
-  if (typeof e === 'number') return e;
-  if (!Array.isArray(e) || e[0] !== 'interpolate' || e[2]?.[0] !== 'zoom') return null;
-  const base = e[1][0] === 'exponential' ? e[1][1] : 1, st = e.slice(3);
-  if (st.some(v => typeof v !== 'number')) return null;
-  if (z <= st[0]) return st[1];
-  for (let i = 2; i < st.length; i += 2) if (z <= st[i]) {
-    const [z0, v0, z1, v1] = [st[i - 2], st[i - 1], st[i], st[i + 1]];
-    const t = base === 1 ? (z - z0) / (z1 - z0) : (base ** (z - z0) - 1) / (base ** (z1 - z0) - 1);
-    return v0 + t * (v1 - v0);
-  }
-  return st[st.length - 1];
+const RW_Z = 14;
+function isRoadLayer(l) {
+  return l.type === 'line' && l['source-layer'] === 'transportation' && !/tunnel|rail|path|pedestrian|pier|subtle/.test(l.id);
 }
-function realRoadWidth(l) {
-  if (l.type !== 'line' || l['source-layer'] !== 'transportation' || /tunnel|rail|path|pedestrian|pier|subtle/.test(l.id)) return null;
-  const w = l.paint?.['line-width'], casing = /casing/.test(l.id);
-  const out = ['interpolate', ['exponential', 2], ['zoom']];
-  for (let z = 4; z <= 22; z++) {
-    const old = zoomVal(w, z);
-    if (old === null) return null;
-    out.push(z, z < 13 ? old : ['max', old, ['+', ['*', ROAD_M, 2 ** z / MPP0], casing ? 2 : 0]]);
-  }
-  return out;
+// ความกว้างเป็นพิกเซล = เมตร × 2^z / MPP0 บวกขอบ (px) ไม่ให้แคบกว่า 1 พิกเซล
+function rwWidth(edge) {
+  const e = ['interpolate', ['exponential', 2], ['zoom']];
+  for (let z = RW_Z; z <= 22; z++) e.push(z, ['+', ['max', 1, ['*', ['get', 'w'], 2 ** z / MPP0]], edge]);
+  return e;
 }
+const MAJOR = ['motorway', 'trunk', 'primary', 'secondary', 'tertiary'];
+// สีถนนให้เข้ากับแผนที่ฐานแต่ละแบบ
+const RW_PAL = {
+  light: { fill: ['match', ['get', 'c'], MAJOR, '#ffffff', '#ebebeb'], casing: '#d0d0d0' },
+  liberty: { fill: ['match', ['get', 'c'], 'motorway', '#ffcc88', MAJOR, '#ffeeaa', '#ffffff'],
+    casing: ['match', ['get', 'c'], MAJOR, '#e9ac77', '#cfcdca'] },
+};
 // ชั้นถนนที่ปรับได้ เก็บความกว้างเดิมกับความกว้างตามจริงไว้สลับกัน
 const roadLayers = [];
 let realRoads = true;
 try { realRoads = localStorage.getItem('realRoads') !== '0'; } catch (err) { /* ใช้ค่าเริ่มต้น */ }
 // ชั้นเทียบถนน แต่ละแหล่งมีสีของตัวเอง
 const CMP = {
-  osm: { color: '#1f78ff', layers: ['cmp-osm'] },
+  osm: { color: '#1f78ff', layers: ['cmp-osm-w', 'cmp-osm'] },
   ovt: { color: '#ff8a00', layers: ['cmp-ovt'] },
   ms: { color: '#8a3ffc', layers: ['ms-roads', 'cmp-ms'] },
   esri: { color: '#e0b000', layers: ['cmp-esri'] },
@@ -841,7 +824,11 @@ function applyCmp() {
   Object.keys(CMP).forEach(k => CMP[k].layers.forEach(id => { if (map.getLayer(id)) map.setLayoutProperty(id, 'visibility', cmp[k] ? 'visible' : 'none'); }));
 }
 function applyRoads() {
-  roadLayers.forEach(r => { if (map.getLayer(r.id)) map.setPaintProperty(r.id, 'line-width', realRoads ? r.real : r.orig); });
+  const pal = realRoads && RW_PAL[basemap];
+  // ถนนของแผนที่ฐาน: เปิดตามเดิมถึงซูม 14 แล้วปล่อยให้ถนนของเราแทน
+  roadLayers.forEach(r => { if (map.getLayer(r.id)) map.setLayerZoomRange(r.id, r.min, pal ? Math.min(r.max, RW_Z) : r.max); });
+  ['rw-case', 'rw-fill'].forEach(id => { if (map.getLayer(id)) map.setLayoutProperty(id, 'visibility', pal ? 'visible' : 'none'); });
+  if (pal && map.getLayer('rw-fill')) { map.setPaintProperty('rw-fill', 'line-color', pal.fill); map.setPaintProperty('rw-case', 'line-color', pal.casing); }
 }
 let bmFirstSymbol;
 // เพิ่มชั้นของสไตล์เวกเตอร์ (ซ่อนไว้ก่อน) ใช้ source/sprite/ฟอนต์เดียวกับแผนที่เรียบ ไม่เอาอาคาร 3 มิติของสไตล์ เพราะมีของเราแล้ว
@@ -854,11 +841,8 @@ async function addVectorBasemap(id) {
   for (const l of st.layers) {
     if (l.type === 'fill-extrusion') continue;
     if (l.source && !map.getSource(l.source)) map.addSource(l.source, st.sources[l.source]);
-    const lid = `bm-${id}-${l.id}`, rw = realRoadWidth(l);
-    if (rw) {
-      roadLayers.push({ id: lid, orig: l.paint['line-width'], real: rw });
-      if (realRoads) l.paint = { ...l.paint, 'line-width': rw };
-    }
+    const lid = `bm-${id}-${l.id}`;
+    if (isRoadLayer(l)) roadLayers.push({ id: lid, min: l.minzoom ?? 0, max: l.maxzoom ?? 24 });
     map.addLayer({ ...l, id: lid, layout: { ...(l.layout || {}), visibility: 'none' } }, l.type === 'symbol' ? bmFirstSymbol : baseLayers[0].id);
     b.layers.push({ id: lid, vis: l.layout?.visibility || 'visible' });
   }
@@ -883,6 +867,7 @@ async function setBasemap(id) {
     const on = id === 'light' || (b.labels && l.type === 'symbol');
     map.setLayoutProperty(l.id, 'visibility', on ? l.vis : 'none');
   });
+  applyRoads();
 }
 map.addControl({ onAdd: () => bmCtl, onRemove: () => bmCtl.remove() }, 'top-right');
 document.addEventListener('click', e => { if (!bmCtl.contains(e.target) && bmCtl.classList.contains('open')) { bmCtl.classList.remove('open'); renderBm(); } });
@@ -920,7 +905,15 @@ map.on('load', async () => {
   const firstSymbol = style.layers.find(l => l.type === 'symbol')?.id;
   baseLayers = style.layers.map(l => ({ id: l.id, type: l.type, vis: l.layout?.visibility || 'visible' }));
   bmFirstSymbol = firstSymbol;
-  style.layers.forEach(l => { const rw = realRoadWidth(l); if (rw) roadLayers.push({ id: l.id, orig: l.paint['line-width'], real: rw }); });
+  style.layers.forEach(l => { if (isRoadLayer(l)) roadLayers.push({ id: l.id, min: l.minzoom ?? 0, max: l.maxzoom ?? 24 }); });
+  // ถนน OSM ที่มีความกว้างรายเส้น วาดใต้ป้ายชื่อ สะพาน/ทางยกระดับอยู่บน
+  map.addSource('osm-w', { type: 'vector', url: `pmtiles://${new URL('osmroads.pmtiles', location.href)}`,
+    attribution: 'Road widths: © OpenStreetMap contributors, Microsoft Road Detections (ODbL)' });
+  const rwSort = ['+', ['coalesce', ['get', 'l'], 0], ['coalesce', ['get', 'b'], 0]];
+  map.addLayer({ id: 'rw-case', type: 'line', source: 'osm-w', 'source-layer': 'roads', minzoom: RW_Z,
+    layout: { 'line-cap': 'round', 'line-join': 'round', 'line-sort-key': rwSort }, paint: { 'line-color': '#d0d0d0', 'line-width': rwWidth(1.5) } }, firstSymbol);
+  map.addLayer({ id: 'rw-fill', type: 'line', source: 'osm-w', 'source-layer': 'roads', minzoom: RW_Z,
+    layout: { 'line-cap': 'round', 'line-join': 'round', 'line-sort-key': rwSort }, paint: { 'line-color': '#ffffff', 'line-width': rwWidth(0) } }, firstSymbol);
   applyRoads();
   setBasemap(basemap);
   const font = style.layers.find(l => l.type === 'symbol' && l.layout?.['text-font'])?.layout['text-font'] || ['Noto Sans Regular'];
@@ -980,8 +973,9 @@ map.on('load', async () => {
     attribution: '© <a href="https://overturemaps.org">Overture Maps Foundation</a> (ODbL)' });
   map.addLayer({ id: 'cmp-ovt', type: 'line', source: 'cmp-ovt', 'source-layer': 'roads', minzoom: 12,
     paint: { 'line-color': ['match', ['get', 'src'], 'tomtom', '#e3261b', CMP.ovt.color], 'line-width': cmpW } });
-  map.addLayer({ id: 'cmp-osm', type: 'line', source: 'openmaptiles', 'source-layer': 'transportation', minzoom: 12,
-    filter: ['match', ['get', 'class'], ['motorway', 'trunk', 'primary', 'secondary', 'tertiary', 'minor', 'service', 'track', 'raceway', 'busway'], true, false],
+  map.addLayer({ id: 'cmp-osm-w', type: 'line', source: 'osm-w', 'source-layer': 'roads', minzoom: 12,
+    layout: { 'line-cap': 'round', 'line-join': 'round' }, paint: { 'line-color': CMP.osm.color, 'line-opacity': 0.25, 'line-width': msW } });
+  map.addLayer({ id: 'cmp-osm', type: 'line', source: 'osm-w', 'source-layer': 'roads', minzoom: 12,
     paint: { 'line-color': CMP.osm.color, 'line-width': cmpW } });
   applyCmp();
   map.addSource('ss-rail', { type: 'geojson', data: 'rail.geojson' });
