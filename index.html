@@ -174,6 +174,9 @@
   .bm-opt img { width: 42px; height: 42px; border-radius: 5px; object-fit: cover; border: 1px solid var(--rule); flex: none; background: var(--wash); }
   .bm-road { display: flex; gap: 7px; align-items: flex-start; font-size: 13px; line-height: 1.4; margin: 8px 4px 2px; cursor: pointer; }
   .bm-road input { margin: 2px 0 0; flex: none; accent-color: var(--staff); }
+  .bm-pop h4 { font: 600 12.5px var(--head); margin: 12px 4px 2px; }
+  .bm-hint { font-size: 12px; line-height: 1.4; color: var(--muted); margin: 0 4px 2px; }
+  .bm-road .sw { width: 16px; height: 4px; border-radius: 2px; margin-top: 8px; flex: none; }
   .bm-note { font-size: 12px; line-height: 1.45; color: var(--muted); margin: 6px 4px 2px; }
   .bm-opt[aria-pressed="true"] img { outline: 2px solid var(--staff); outline-offset: 1px; }
 </style>
@@ -260,7 +263,10 @@ const I18N = {
     district: 'เขต/อำเภอ',
     bmTitle: 'แผนที่ฐาน', bmNames: { light: 'แผนที่เรียบ', osm: 'OpenStreetMap', liberty: 'ถนน (OpenFreeMap)', streets: 'ถนน (Esri)', sat: 'ภาพดาวเทียม (Esri)', topo: 'ภูมิประเทศ (Esri)' },
     bmRoads: 'ถนนกว้างตามขนาดจริงเมื่อซูมเข้า (แผนที่เรียบ, OpenFreeMap)',
-    bmMs: 'เส้นถนนที่ลากจากภาพถ่ายทางอากาศ (Microsoft) สีม่วง กว้างตามที่ตรวจจับได้ เห็นเมื่อซูมเข้า',
+    cmpTitle: 'เทียบถนนจากหลายแหล่ง',
+    cmpHint: 'เปิดหลายชั้นซ้อนบนภาพดาวเทียม จะเห็นว่าแต่ละแหล่งคลาดกันแค่ไหน (เห็นเมื่อซูมเข้า)',
+    cmpNames: { osm: 'OpenStreetMap: อาสาสมัครวาด', ovt: 'Overture: OSM + TomTom (ส่วนของ TomTom เป็นสีแดง)',
+      ms: 'Microsoft: AI ลากจากภาพถ่าย Bing แถบจาง = ความกว้างที่ตรวจจับได้', esri: 'Esri: ข้อมูล HERE/Garmin (เป็นภาพ)' },
     bmNote: '* ใช้ข้อมูลถนนคนละชุดกับเส้นรางและอาคาร (OpenStreetMap) แนวถนนจึงอาจคลาดกัน 10–20 ม.',
     mSub: 'อัตราการทรุด', mRisk: 'ความเสี่ยง', mSlr: 'น้ำทะเล',
     scaleSlr: 'ความลึกน้ำท่วมจากทะเลช่วงน้ำขึ้นสูงประจำปี (แบบจำลองชลศาสตร์ SFINCS)',
@@ -304,7 +310,10 @@ const I18N = {
     district: 'District',
     bmTitle: 'Basemap', bmNames: { light: 'Plain', osm: 'OpenStreetMap', liberty: 'Streets (OpenFreeMap)', streets: 'Streets (Esri)', sat: 'Satellite (Esri)', topo: 'Topographic (Esri)' },
     bmRoads: 'Real road widths when zoomed in (Plain, OpenFreeMap)',
-    bmMs: 'Roads traced from aerial imagery (Microsoft), purple, at their detected width; shown when zoomed in',
+    cmpTitle: 'Compare road sources',
+    cmpHint: 'Turn several on over the satellite map to see how far the sources disagree (shown when zoomed in).',
+    cmpNames: { osm: 'OpenStreetMap: drawn by volunteers', ovt: 'Overture: OSM + TomTom (TomTom parts in red)',
+      ms: 'Microsoft: AI-traced from Bing imagery; pale band = detected width', esri: 'Esri: HERE/Garmin data (image)' },
     bmNote: '* Uses a different road dataset from the rail and building layers (OpenStreetMap), so roads may sit 10–20 m off.',
     mSub: 'Sinking rate', mRisk: 'Risk', mSlr: 'Sea level',
     scaleSlr: 'Sea flooding depth during the yearly highest tide (SFINCS hydrodynamic model)',
@@ -723,14 +732,15 @@ function renderBm() {
   bmCtl.innerHTML = `<button class="bm-btn" type="button" aria-haspopup="true" aria-expanded="${bmCtl.classList.contains('open')}" title="${T('bmTitle')}" aria-label="${T('bmTitle')}">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3 2 8.5 12 14l10-5.5L12 3Z"/><path d="m2 13 10 5.5L22 13"/><path d="m2 17.5 10 5.5 10-5.5" opacity=".55"/></svg></button>
     <div class="bm-pop" role="menu"><h3>${T('bmTitle')}</h3>${Object.keys(BASEMAPS).map(k =>
-      `<button class="bm-opt" type="button" role="menuitemradio" data-bm="${k}" aria-pressed="${k === basemap}"><img src="${BASEMAPS[k].thumb}" alt="" loading="lazy">${T('bmNames')[k]}${BASEMAPS[k].note ? ' *' : ''}</button>`).join('')}<label class="bm-road"><input type="checkbox"${realRoads ? ' checked' : ''}>${T('bmRoads')}</label><label class="bm-road"><input type="checkbox" data-ms${msRoads ? ' checked' : ''}>${T('bmMs')}</label><p class="bm-note">${T('bmNote')}</p></div>`;
+      `<button class="bm-opt" type="button" role="menuitemradio" data-bm="${k}" aria-pressed="${k === basemap}"><img src="${BASEMAPS[k].thumb}" alt="" loading="lazy">${T('bmNames')[k]}${BASEMAPS[k].note ? ' *' : ''}</button>`).join('')}<label class="bm-road"><input type="checkbox"${realRoads ? ' checked' : ''}>${T('bmRoads')}</label><h4>${T('cmpTitle')}</h4><p class="bm-hint">${T('cmpHint')}</p>${Object.keys(CMP).map(k =>
+      `<label class="bm-road"><input type="checkbox" data-cmp="${k}"${cmp[k] ? ' checked' : ''}><span class="sw" style="background:${CMP[k].color}"></span>${T('cmpNames')[k]}</label>`).join('')}<p class="bm-note">${T('bmNote')}</p></div>`;
   bmCtl.querySelector('.bm-btn').onclick = e => { e.stopPropagation(); bmCtl.classList.toggle('open'); renderBm(); };
   bmCtl.querySelectorAll('.bm-opt').forEach(b => b.onclick = e => { e.stopPropagation(); setBasemap(b.dataset.bm); });
-  bmCtl.querySelector('[data-ms]').onchange = e => {
-    msRoads = e.target.checked;
-    try { localStorage.setItem('msRoads', msRoads ? '1' : '0'); } catch (err) { /* ไม่มี storage ก็ใช้ได้ */ }
-    if (map.getLayer('ms-roads')) map.setLayoutProperty('ms-roads', 'visibility', msRoads ? 'visible' : 'none');
-  };
+  bmCtl.querySelectorAll('[data-cmp]').forEach(i => i.onchange = e => {
+    cmp[i.dataset.cmp] = e.target.checked;
+    try { localStorage.setItem('roadCmp', JSON.stringify(cmp)); } catch (err) { /* ไม่มี storage ก็ใช้ได้ */ }
+    applyCmp();
+  });
   bmCtl.querySelector('.bm-road input').onchange = e => {
     realRoads = e.target.checked;
     try { localStorage.setItem('realRoads', realRoads ? '1' : '0'); } catch (err) { /* ไม่มี storage ก็ใช้ได้ */ }
@@ -778,8 +788,20 @@ function realRoadWidth(l) {
 }
 // ชั้นถนนที่ปรับได้ เก็บความกว้างเดิมกับความกว้างตามจริงไว้สลับกัน
 const roadLayers = [];
-let realRoads = true, msRoads = false;
-try { realRoads = localStorage.getItem('realRoads') !== '0'; msRoads = localStorage.getItem('msRoads') === '1'; } catch (err) { /* ใช้ค่าเริ่มต้น */ }
+let realRoads = true;
+try { realRoads = localStorage.getItem('realRoads') !== '0'; } catch (err) { /* ใช้ค่าเริ่มต้น */ }
+// ชั้นเทียบถนน แต่ละแหล่งมีสีของตัวเอง
+const CMP = {
+  osm: { color: '#1f78ff', layers: ['cmp-osm'] },
+  ovt: { color: '#ff8a00', layers: ['cmp-ovt'] },
+  ms: { color: '#8a3ffc', layers: ['ms-roads', 'cmp-ms'] },
+  esri: { color: '#e0b000', layers: ['cmp-esri'] },
+};
+const cmp = { osm: false, ovt: false, ms: false, esri: false };
+try { Object.assign(cmp, JSON.parse(localStorage.getItem('roadCmp') || '{}')); } catch (err) { /* ใช้ค่าเริ่มต้น */ }
+function applyCmp() {
+  Object.keys(CMP).forEach(k => CMP[k].layers.forEach(id => { if (map.getLayer(id)) map.setLayoutProperty(id, 'visibility', cmp[k] ? 'visible' : 'none'); }));
+}
 function applyRoads() {
   roadLayers.forEach(r => { if (map.getLayer(r.id)) map.setPaintProperty(r.id, 'line-width', realRoads ? r.real : r.orig); });
 }
@@ -896,14 +918,29 @@ map.on('load', async () => {
     map.addLayer({ id: `ss-bld${i}`, type: 'fill-extrusion', source: `ss-b${i}`, 'source-layer': 'buildings', minzoom: 13,
       paint: { 'fill-extrusion-color': colorExpr('c'), 'fill-extrusion-height': ['get', 'h'], 'fill-extrusion-opacity': .93 } });
   });
+  // ถนนของ Esri (HERE/Garmin) เป็นภาพโปร่งใสที่มีแต่เส้นถนน
+  map.addSource('cmp-esri', { type: 'raster', tiles: [ESRI + 'Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}'], tileSize: 256, maxzoom: 15,  // ซูม 16 ขึ้นไป Esri มีแต่ป้ายชื่อ ไม่มีเส้นถนน จึงขยายภาพซูม 15 แทน
+    attribution: 'Roads © Esri — HERE, Garmin' });
+  map.addLayer({ id: 'cmp-esri', type: 'raster', source: 'cmp-esri', minzoom: 12, paint: { 'raster-opacity': 0.8 } });
   // ถนนที่ Microsoft ตรวจจับจากภาพถ่าย Bing พร้อมความกว้างโดยประมาณ (w, เมตร) ตัดเฉพาะพื้นที่ศึกษา ซูม 12–15
   map.addSource('ms-roads', { type: 'vector', url: `pmtiles://${new URL('msroads.pmtiles', location.href)}`,
     attribution: 'Road detections © <a href="https://github.com/microsoft/RoadDetections">Microsoft</a> (ODbL)' });
   const msW = ['interpolate', ['exponential', 2], ['zoom']];
   for (let z = 12; z <= 22; z++) msW.push(z, ['max', 1, ['*', ['get', 'w'], 2 ** z / MPP0]]);
   map.addLayer({ id: 'ms-roads', type: 'line', source: 'ms-roads', 'source-layer': 'roads', minzoom: 12,
-    layout: { visibility: msRoads ? 'visible' : 'none', 'line-cap': 'round', 'line-join': 'round' },
-    paint: { 'line-color': '#8a3ffc', 'line-opacity': 0.5, 'line-width': msW } });
+    layout: { 'line-cap': 'round', 'line-join': 'round' }, paint: { 'line-color': CMP.ms.color, 'line-opacity': 0.3, 'line-width': msW } });
+  // เส้นกลางถนนของแต่ละแหล่ง บางเท่ากัน จะได้เห็นว่าคลาดกันแค่ไหน
+  const cmpW = ['interpolate', ['linear'], ['zoom'], 12, 1, 16, 2.2, 19, 2.6];
+  map.addLayer({ id: 'cmp-ms', type: 'line', source: 'ms-roads', 'source-layer': 'roads', minzoom: 12,
+    paint: { 'line-color': CMP.ms.color, 'line-width': cmpW } });
+  map.addSource('cmp-ovt', { type: 'vector', url: `pmtiles://${new URL('ovtroads.pmtiles', location.href)}`,
+    attribution: '© <a href="https://overturemaps.org">Overture Maps Foundation</a> (ODbL)' });
+  map.addLayer({ id: 'cmp-ovt', type: 'line', source: 'cmp-ovt', 'source-layer': 'roads', minzoom: 12,
+    paint: { 'line-color': ['match', ['get', 'src'], 'tomtom', '#e3261b', CMP.ovt.color], 'line-width': cmpW } });
+  map.addLayer({ id: 'cmp-osm', type: 'line', source: 'openmaptiles', 'source-layer': 'transportation', minzoom: 12,
+    filter: ['match', ['get', 'class'], ['motorway', 'trunk', 'primary', 'secondary', 'tertiary', 'minor', 'service', 'track', 'raceway', 'busway'], true, false],
+    paint: { 'line-color': CMP.osm.color, 'line-width': cmpW } });
+  applyCmp();
   map.addSource('ss-rail', { type: 'geojson', data: 'rail.geojson' });
   map.addLayer({ id: 'ss-rail-case', type: 'line', source: 'ss-rail', paint: { 'line-color': '#1b2629', 'line-width': ['interpolate', ['linear'], ['zoom'], 9, 2.6, 14, 5.5, 18, 6.5] } });
   map.addLayer({ id: 'ss-rail', type: 'line', source: 'ss-rail', paint: { 'line-color': colorExpr('c'), 'line-width': ['interpolate', ['linear'], ['zoom'], 9, 1.4, 14, 3.2, 18, 3.8] } });
