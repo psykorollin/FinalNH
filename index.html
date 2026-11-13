@@ -226,8 +226,8 @@
 
   <div class="seg" role="group" aria-label="theme">
     <button id="m-sub" aria-pressed="true" data-i18n="mSub">อัตราการทรุด</button>
-    <button id="m-risk" aria-pressed="false" data-i18n="mRisk" hidden>ความเสี่ยง</button>
     <button id="m-slr" aria-pressed="false" data-i18n="mSlr" hidden>น้ำทะเล</button>
+    <button id="m-risk" aria-pressed="false" data-i18n="mRisk" hidden>ความเสี่ยง</button>
   </div>
   <div id="slrCtl" hidden>
     <div class="ctl-l" data-i18n="cYear">ปี</div>
@@ -307,6 +307,8 @@ const I18N = {
     bldLegT: 'สีอาคาร: ความเสี่ยงจากพื้นดินทรุด (มม./ปี)',
     bldLev: [['ไม่ทรุด', ''], ['ต่ำ', '0–5'], ['กลาง', '5–10'], ['สูง', '10–20'], ['สูงมาก', '>20']],
     bldNd: 'ไม่มีข้อมูล',
+    bldLegRisk: 'สีอาคาร: ระดับความเสี่ยงของช่อง 100 ม. ที่อาคารตั้งอยู่',
+    bldLegSlr: 'สีอาคาร: ความลึกน้ำท่วมจากทะเลในฉากทัศน์ที่เลือก', bldDry: 'ไม่ท่วม',
     lLm: 'สถานที่สำคัญ', lFac: 'โรงเรียน โรงพยาบาล สถานีตำรวจ/ดับเพลิง สถานีรถไฟ', lEv: 'เหตุการณ์สำคัญ', evList: 'ลำดับเหตุการณ์ (แตะเพื่อดูบนแผนที่)',
     facT: { school: 'โรงเรียน', university: 'มหาวิทยาลัย', hospital: 'โรงพยาบาล', police: 'สถานีตำรวจ', fire_station: 'สถานีดับเพลิง', rail_station: 'สถานีรถไฟ/รถไฟฟ้า', airport: 'สนามบิน' },
     lmK: 'สถานที่สำคัญ', evK: 'เหตุการณ์สำคัญ', facV: 'อัตราทรุดรอบสถานที่', facRange: 'ช่วงตามความไม่แน่นอน (มม./ปี)', facB: 'การทรุดไม่เท่ากัน (β)',
@@ -361,6 +363,8 @@ const I18N = {
     bldLegT: 'Building colour: risk from sinking ground (mm/yr)',
     bldLev: [['None', ''], ['Low', '0–5'], ['Mid', '5–10'], ['High', '10–20'], ['Very high', '>20']],
     bldNd: 'No data',
+    bldLegRisk: 'Building colour: risk class of the 100 m cell it stands in',
+    bldLegSlr: 'Building colour: sea flooding depth in the selected scenario', bldDry: 'Not flooded',
     lLm: 'Key places', lFac: 'Schools, hospitals, police/fire stations, rail stations', lEv: 'Key events', evList: 'Timeline (tap to see on the map)',
     facT: { school: 'School', university: 'University', hospital: 'Hospital', police: 'Police station', fire_station: 'Fire station', rail_station: 'Rail/metro station', airport: 'Airport' },
     lmK: 'Key place', evK: 'Key event', facV: 'Sinking around the site', facRange: 'Range with uncertainty (mm/yr)', facB: 'Uneven sinking (β)',
@@ -438,7 +442,7 @@ const ABOUT = {
     <li>ค่าเป็นมิลลิเมตรต่อปี เช่น 15 มม. ต่อปี หมายถึงถ้าทรุดในอัตรานี้ต่อไป 10 ปีจะต่ำลงราว 15 ซม.</li>
     <li>สีบอกความเร็วของการทรุด ไม่ได้บอกว่าอาคารจะเสียหาย ความเสียหายขึ้นกับฐานรากและการทรุดที่ไม่เท่ากันในระยะสั้น ๆ</li>
     <li>ที่ที่ดาวเทียมวัดได้ไม่ชัด เช่น นาข้าว บ่อเลี้ยงสัตว์น้ำ และแหล่งน้ำ (ราว 29% ของพื้นที่ศึกษา) เติมสีด้วยค่าประมาณจากสิ่งปกคลุมดินและจุดวัดรอบ ๆ ให้เต็มสามจังหวัด ปิดได้ที่ช่องใต้แถบสี การ์ดจะบอกว่าค่าไหนเป็นค่าประมาณ</li>
-    <li>สีของอาคารมาจากอัตราทรุดของพื้นที่รอบอาคาร (ช่องละ 80 ม.) ไม่ได้วัดตัวอาคารแต่ละหลัง</li></ul>
+    <li>สีของอาคารเปลี่ยนตามแถบที่เลือก: อัตราทรุดของพื้นที่รอบอาคาร (ช่องละ 80 ม.), ความลึกน้ำท่วมจากทะเลของฉากทัศน์ที่เลือก (ช่อง 100 ม.) หรือระดับความเสี่ยง (ช่อง 100 ม.) ไม่ได้วัดตัวอาคารแต่ละหลัง</li></ul>
     <h4>การเติมช่องว่าง</h4>
     <p>ช่องที่ดาวเทียมวัดไม่ได้ส่วนใหญ่เป็นบ่อเลี้ยงสัตว์น้ำ นาข้าว และแหล่งน้ำ ซึ่งไม่เหมือนเมืองหรือถนนข้าง ๆ การเฉลี่ยจากจุดวัดรอบ ๆ อย่างเดียว (IDW) จึงยืมค่าจากพื้นที่ที่ทรุดคนละแบบ เราจึงเติมสองชั้น (regression kriging แบบง่าย): (1) แบบจำลอง gradient boosting เรียนอัตราทรุดของช่องที่วัดได้ 336,732 ช่องจากสัดส่วนสิ่งปกคลุมดิน ESA WorldCover 2021 (10 ม.) ในช่องและรอบ ๆ (ราว 0.5 และ 2 กม.) จำนวนอาคาร ประชากร WorldPop 2025 ความสูง DeltaDTM ระยะถึงทะเลและแหล่งน้ำ และตำแหน่ง (แนวโน้มระดับภูมิภาคจากการสูบน้ำบาดาล) (2) ส่วนต่างระหว่างค่าวัดกับแบบจำลองของจุดวัดใกล้ ๆ บวกกลับโดยลดลงตามระยะ (ครึ่งหนึ่งที่ราว 1 กม.) ใกล้จุดวัดค่าจึงต่อกับค่าวัด ไกลออกไปขึ้นกับสิ่งปกคลุมดินเป็นหลัก ทดสอบโดยซ่อนจุดวัดทั้งบล็อก 3 × 3 กม. แล้วประมาณกลับ: คลาดเฉลี่ย 1.7 มม. ต่อปี (IDW 2.0) และในช่องที่เป็นบ่อหรือนาเป็นส่วนใหญ่ 2.9 มม. ต่อปี (IDW 3.3) IDW ประเมินการทรุดในบ่อและนาต่ำไปเฉลี่ย 0.65 มม. ต่อปี วิธีใหม่ไม่เอียง ช่องที่เติมคิดเป็น 29% ของพื้นที่ศึกษา ครึ่งหนึ่งห่างจุดวัดไม่เกิน 220 ม. และ 95% ไม่เกิน 1.6 กม. ค่าเติมไม่ได้ใช้ในตารางสรุปรายเขต การจัดอันดับ และ exposure</p>
     <h4>แผนที่ความเสี่ยง</h4>
@@ -475,7 +479,7 @@ const ABOUT = {
     <li>Values are millimetres per year. 15 mm a year means about 15 cm lower after 10 years if the rate continues.</li>
     <li>Colours show how fast the ground sinks, not whether buildings will be damaged. Damage depends on foundations and on uneven sinking over short distances.</li>
     <li>Spots the satellite cannot measure reliably, such as rice fields, fish ponds and water (about 29% of the study area), are filled with estimates from land cover and nearby measurements so the three provinces are fully covered. Untick the box under the colour bar to hide them; the card says when a value is an estimate.</li>
-    <li>Building colours come from the rate of the surrounding 80 m cell, not from each building itself.</li></ul>
+    <li>Building colours follow the selected tab: the sinking rate of the surrounding 80 m cell, the sea flooding depth of the selected scenario (100 m cell) or the risk class (100 m cell), not a measurement of each building.</li></ul>
     <h4>Filling the gaps</h4>
     <p>Most cells the satellite cannot measure are fish ponds, rice fields and water, which behave differently from the towns and roads next to them, so averaging nearby measurements alone (IDW) borrows values from land that sinks differently. The gaps are filled in two layers (a simple regression kriging): (1) a gradient-boosting model learns the sinking rate of the 336,732 measured cells from ESA WorldCover 2021 (10 m) land-cover shares in and around the cell (about 0.5 and 2 km), building count, WorldPop 2025 population, DeltaDTM height, distance to the sea and to water, and position (the regional pattern of groundwater pumping); (2) the difference between measurement and model at nearby measured cells is added back, fading with distance (half at about 1 km), so values join the measurements near them and depend mainly on land cover further away. Hiding whole 3 × 3 km blocks of measurements and estimating them back gives a mean error of 1.7 mm a year (IDW 2.0), and 2.9 mm a year in cells that are mostly ponds or fields (IDW 3.3). IDW underestimates sinking in ponds and fields by 0.65 mm a year on average; the new method shows no bias. Filled cells make up 29% of the study area; half are within 220 m of a measurement and 95% within 1.6 km. Estimates are not used in the district tables, rankings or exposure figures.</p>
     <h4>Risk map</h4>
@@ -591,6 +595,21 @@ function classOf(v) {
 function colorExpr(prop) {
   return ['match', ['get', prop], ...meta.colors.flatMap((c, i) => [i, c]), '#c8c8c8'];
 }
+// สีอาคารตามโหมด: อัตราทรุด (c), ระดับความเสี่ยง (r), ความลึกน้ำท่วมของฉากทัศน์ที่เลือก (f: หนึ่งหลักต่อหนึ่งรอบใน meta.sfl.order)
+const BLD_DRY = '#e4e1da';
+function bldColor() {
+  if (mode === 'risk') return ['match', ['coalesce', ['get', 'r'], -1], ...RISK_COLORS.flatMap((c, i) => [i, c]), '#c8c8c8'];
+  const order = meta.sfl?.order || [], i = order.indexOf(runName());
+  if (mode === 'slr' && i >= 0) return ['match', ['to-number', ['slice', ['coalesce', ['get', 'f'], '0'.repeat(order.length)], i, i + 1]],
+    ...meta.sfl.depth.flatMap(([lo, c], k) => [k + 1, c]), BLD_DRY];
+  return colorExpr('c');
+}
+function applyBld() {
+  if (!meta) return;
+  const e = bldColor();
+  meta.buildings.forEach((_, i) => map.getLayer(`ss-bld${i}`) && map.setPaintProperty(`ss-bld${i}`, 'fill-extrusion-color', e));
+  renderBldLegend();
+}
 const fmt = (x, d = 1) => x.toLocaleString(lang === 'th' ? 'th-TH' : 'en-GB', { minimumFractionDigits: d, maximumFractionDigits: d });
 
 // ---- สัญลักษณ์แบบไม้บรรทัด ----
@@ -620,6 +639,16 @@ function legendHTML() {
 function renderBldLegend() {
   if (!meta) return;
   const cell = (c, lab, cls = '') => `<div class="${cls}"><i style="background:${c}"></i><div class="bl-lab">${lab}</div></div>`;
+  if (mode === 'risk') {
+    $('bldLeg').innerHTML = `<h2 id="bldLegT">${T('bldLegRisk')}</h2><div class="bl-bar">${RISK_COLORS.map((c, i) =>
+      cell(c, `<b>${T('rcls')[i]}</b>`)).join('')}${cell('#c8c8c8', T('bldNd'), 'bl-nd')}</div>`;
+    return;
+  }
+  if (mode === 'slr' && meta.sfl) {
+    $('bldLeg').innerHTML = `<h2 id="bldLegT">${T('bldLegSlr')}</h2><div class="bl-bar">${cell(BLD_DRY, `<b>${T('bldDry')}</b>`)}${meta.sfl.depth.map(([lo, c], i) =>
+      cell(c, `<b>${T('depthL')[i]}</b>`)).join('')}</div>`;
+    return;
+  }
   $('bldLeg').innerHTML = `<h2 id="bldLegT">${T('bldLegT')}</h2><div class="bl-bar">${T('bldLev').map(([a, b], i) =>
     cell(meta.colors[i], `<b>${a}</b>${b ? ' ' + b : ''}`)).join('')}${cell('#c8c8c8', T('bldNd'), 'bl-nd')}</div>`;
 }
@@ -672,6 +701,7 @@ function applyIdw() {
 const NOW = 2026;
 const runName = (sub = subOn) => slrYear === NOW ? `now_${defOn}` : `${slrYear}_${ssp}_${sub}_${defOn}`;
 async function showFlood() {
+  if (mode === 'slr') applyBld();
   const n = runName();
   if (!meta.sfl.runs[n]) return;
   document.querySelectorAll('[data-ssp],[data-sub]').forEach(b => b.disabled = slrYear === NOW);
@@ -970,6 +1000,7 @@ function setMode(m) {
   if (m === 'slr') showFlood();
   $('scaleT').textContent = m === 'risk' ? T('scaleRisk') : m === 'slr' ? T('scaleSlr') : T('scaleSub');
   $('legend').innerHTML = legendHTML();
+  applyBld();
   if (last) showCard(last);
 }
 
