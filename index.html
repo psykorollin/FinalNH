@@ -233,8 +233,8 @@
     <div class="ctl-l" data-i18n="cYear">ปี</div>
     <div class="seg" role="group" aria-label="year">
       <button data-yr="2026" aria-pressed="false">ปัจจุบัน</button>
-      <button data-yr="2050" aria-pressed="true">2593</button>
-      <button data-yr="2100" aria-pressed="false">2643</button>
+      <button data-yr="2036" aria-pressed="true">2579</button>
+      <button data-yr="2046" aria-pressed="false">2589</button>
     </div>
     <div class="ctl-l" data-i18n="cSsp">ฉากทัศน์ภูมิอากาศ</div>
     <div class="seg" role="group" aria-label="scenario">
@@ -311,8 +311,10 @@ const I18N = {
     facT: { school: 'โรงเรียน', university: 'มหาวิทยาลัย', hospital: 'โรงพยาบาล', police: 'สถานีตำรวจ', fire_station: 'สถานีดับเพลิง', rail_station: 'สถานีรถไฟ/รถไฟฟ้า', airport: 'สนามบิน' },
     lmK: 'สถานที่สำคัญ', evK: 'เหตุการณ์สำคัญ', facV: 'อัตราทรุดรอบสถานที่', facRange: 'ช่วงตามความไม่แน่นอน (มม./ปี)', facB: 'การทรุดไม่เท่ากัน (β)',
     bcls: { low: 'ต่ำ', medium: 'ปานกลาง', high: 'สูง', very_high: 'สูงมาก' },
-    idwL: 'เติมจุดที่ดาวเทียมวัดไม่ได้ด้วยค่าประมาณ IDW',
-    idwWarn: d => `ดาวเทียมวัดตรงนี้ไม่ได้ ค่านี้ประมาณจากจุดวัดรอบ ๆ ด้วยวิธี IDW (จุดวัดที่ใกล้ที่สุดห่าง ${d}) ใช้ดูแนวโน้มเท่านั้น`,
+    idwL: 'เติมจุดที่ดาวเทียมวัดไม่ได้ด้วยค่าประมาณจากสิ่งปกคลุมดิน',
+    idwWarn: (d, lc) => `ดาวเทียมวัดตรงนี้ไม่ได้${lc ? ` (ส่วนใหญ่เป็น${lc})` : ''} ค่านี้ประมาณจากสิ่งปกคลุมดิน อาคาร ประชากร ความสูงพื้น และจุดวัดรอบ ๆ (จุดวัดที่ใกล้ที่สุดห่าง ${d}) ใช้ดูแนวโน้มเท่านั้น`,
+    lcN: ['ต้นไม้/สวน', 'ไม้พุ่ม', 'ทุ่งหญ้า', 'นา/ไร่', 'สิ่งปลูกสร้าง', 'พื้นที่โล่ง', 'บ่อ/แหล่งน้ำ', 'พื้นที่ชุ่มน้ำ', 'ป่าชายเลน'],
+    riskX: ['ดาวเทียมวัดอัตราทรุดตรงนี้ไม่ได้ ภัยจึงใช้ค่าเติมจากสิ่งปกคลุมดิน', 'ไม่มีคนหรืออาคารในช่องนี้ ความเสี่ยงจึงมักต่ำ'],
     yrL: n => `อีก ${n} ปี`, kmU: 'กม.', mU: 'ม.',
     nod: 'วัดไม่ได้ เช่น นาข้าว บ่อปลา แหล่งน้ำ', stable: 'ไม่ทรุดหรือยกตัว (0 ขึ้นไป)', faint: 'สีจาง = ค่าไม่แน่นอนสูง', riskLo: 'ต่ำมาก', riskHi: 'สูงมาก',
     lFlood: 'น้ำท่วม 21 ต.ค. 2569 จากภาพเรดาร์', lGfm: 'น้ำท่วมวันเดียวกันจาก Copernicus GFM (ใช้เทียบ)',
@@ -363,8 +365,10 @@ const I18N = {
     facT: { school: 'School', university: 'University', hospital: 'Hospital', police: 'Police station', fire_station: 'Fire station', rail_station: 'Rail/metro station', airport: 'Airport' },
     lmK: 'Key place', evK: 'Key event', facV: 'Sinking around the site', facRange: 'Range with uncertainty (mm/yr)', facB: 'Uneven sinking (β)',
     bcls: { low: 'Low', medium: 'Moderate', high: 'High', very_high: 'Very high' },
-    idwL: 'Fill unmeasured spots with IDW estimates',
-    idwWarn: d => `The satellite cannot measure this spot. This value is estimated from surrounding measurements by IDW (nearest measurement ${d} away); treat it as a rough indication.`,
+    idwL: 'Fill unmeasured spots with land-cover estimates',
+    idwWarn: (d, lc) => `The satellite cannot measure this spot${lc ? ` (mostly ${lc})` : ''}. This value is estimated from land cover, buildings, population, ground height and surrounding measurements (nearest measurement ${d} away); treat it as a rough indication.`,
+    lcN: ['trees/orchards', 'shrubs', 'grass', 'rice fields/crops', 'built-up land', 'bare ground', 'ponds/water', 'wetland', 'mangrove'],
+    riskX: ['The satellite cannot measure sinking here, so the hazard uses the land-cover estimate', 'No people or buildings in this cell, so the risk is usually low'],
     yrL: n => `in ${n} yrs`, kmU: 'km', mU: 'm',
     nod: 'Not measurable, such as rice fields, fish ponds and water', stable: 'Not sinking or rising (0 or more)', faint: 'Faded colour = high uncertainty', riskLo: 'Very low', riskHi: 'Very high',
     lFlood: 'Flooding on 21 Oct 2026 from radar', lGfm: 'Same-day flooding from Copernicus GFM (comparison)',
@@ -400,6 +404,7 @@ const SOURCES = {
     <li>GNSS สำหรับอ้างอิงและตรวจสอบ: หมุด CUSV และ KMIT จาก Nevada Geodetic Laboratory (IGS20)</li>
     <li>อาคารและความสูง: Global Building Atlas (GBA)</li>
     <li>ประชากรและโครงสร้างอายุ: WorldPop 2025</li>
+    <li>สิ่งปกคลุมดิน (ใช้เติมช่องว่าง): ESA WorldCover 10 m 2021 v200 (Zanaga et al. 2022)</li>
     <li>แนวราง ถนน และสถานที่สำคัญ: Overture Maps / OpenStreetMap</li>
     <li>ขอบเขตปกครอง: HDX COD-AB (OCHA)</li>
     <li>ความสูงพื้นดิน: DeltaDTM v1.1 (Pronk et al. 2024), ผิวน้ำทะเลเฉลี่ย DTU21 MSS, ระดับน้ำทะเลในอนาคต IPCC AR6 (Fox-Kemper et al. 2021; Garner et al. 2021), ระดับน้ำจาก GTSM (Copernicus Climate Change Service), แบบจำลองน้ำท่วม SFINCS (Leijnse et al. 2021, Deltares)</li>
@@ -411,6 +416,7 @@ const SOURCES = {
     <li>GNSS reference and validation: stations CUSV and KMIT from the Nevada Geodetic Laboratory (IGS20)</li>
     <li>Buildings and heights: Global Building Atlas (GBA)</li>
     <li>Population and age structure: WorldPop 2025</li>
+    <li>Land cover (for gap filling): ESA WorldCover 10 m 2021 v200 (Zanaga et al. 2022)</li>
     <li>Rail, roads and key facilities: Overture Maps / OpenStreetMap</li>
     <li>Administrative boundaries: HDX COD-AB (OCHA)</li>
     <li>Ground height: DeltaDTM v1.1 (Pronk et al. 2024); mean sea surface DTU21 MSS; future sea level IPCC AR6 (Fox-Kemper et al. 2021; Garner et al. 2021); water levels from GTSM (Copernicus Climate Change Service); flood model SFINCS (Leijnse et al. 2021, Deltares)</li>
@@ -418,9 +424,9 @@ const SOURCES = {
     <li>Basemap: OpenFreeMap © OpenMapTiles © OpenStreetMap; address search by Photon (komoot) on OpenStreetMap data</li></ul>`,
 };
 const DOWNLOADS = {
-  th: ['อัตราทรุดแนวดิ่ง (มม./ปี)', 'ความไม่แน่นอนเชิงสถิติ', 'แนวตะวันออก–ตะวันตก', 'ความเสี่ยง 5 ระดับ (100 ม.)', 'น้ำท่วม 21 ต.ค. 2569', 'ความสูงพื้นดินปี 2569 (ม. เหนือ MSL)', 'ตารางน้ำท่วมจากทะเลทุกฉากทัศน์ (SFINCS)', 'วิธีทำและผลการตรวจสอบ'],
-  en: ['Vertical rate (mm/yr)', 'Statistical uncertainty', 'East–west component', 'Risk classes (100 m)', 'Flooding 21 Oct 2026', 'Ground height 2026 (m above MSL)', 'Sea flooding for every scenario (SFINCS)', 'Method and validation'],
-  files: ['results/full/vlm_full.tif', 'results/full/sd_full.tif', 'results/full/east_full.tif', 'results/risk_raster/risk_class.tif',
+  th: ['อัตราทรุดแนวดิ่ง (มม./ปี)', 'อัตราทรุดเติมช่องว่างเต็มพื้นที่ (แบนด์ 2: 1 = ค่าเติม)', 'ความไม่แน่นอนเชิงสถิติ', 'แนวตะวันออก–ตะวันตก', 'ความเสี่ยง 5 ระดับ (100 ม.)', 'น้ำท่วม 21 ต.ค. 2569', 'ความสูงพื้นดินปี 2569 (ม. เหนือ MSL)', 'ตารางน้ำท่วมจากทะเลทุกฉากทัศน์ (SFINCS)', 'วิธีทำและผลการตรวจสอบ'],
+  en: ['Vertical rate (mm/yr)', 'Vertical rate with gaps filled (band 2: 1 = estimate)', 'Statistical uncertainty', 'East–west component', 'Risk classes (100 m)', 'Flooding 21 Oct 2026', 'Ground height 2026 (m above MSL)', 'Sea flooding for every scenario (SFINCS)', 'Method and validation'],
+  files: ['results/full/vlm_full.tif', 'results/full/vlm_filled.tif', 'results/full/sd_full.tif', 'results/full/east_full.tif', 'results/risk_raster/risk_full_class.tif',
     'results/flood/flood_20261021.tif', 'results/slr/elev_2026.tif', 'results/sfincs/flood_summary.csv', 'docs/full_method.md'],
 };
 const dl = l => `<ul>${DOWNLOADS[l].map((t, i) => `<li><a href="${DOWNLOADS.files[i].endsWith('.md') ? GH.replace('/raw/', '/blob/') : GH}${DOWNLOADS.files[i]}">${t}</a> <small>${DOWNLOADS.files[i].split('/').pop()}</small></li>`).join('')}</ul>`;
@@ -431,19 +437,21 @@ const ABOUT = {
     <ul><li>ค่า ± คือความไม่แน่นอนโดยประมาณ รวมค่าทางสถิติกับครึ่งหนึ่งของความต่างระหว่างดาวเทียมสองวงโคจร</li>
     <li>ค่าเป็นมิลลิเมตรต่อปี เช่น 15 มม. ต่อปี หมายถึงถ้าทรุดในอัตรานี้ต่อไป 10 ปีจะต่ำลงราว 15 ซม.</li>
     <li>สีบอกความเร็วของการทรุด ไม่ได้บอกว่าอาคารจะเสียหาย ความเสียหายขึ้นกับฐานรากและการทรุดที่ไม่เท่ากันในระยะสั้น ๆ</li>
-    <li>ที่ที่ดาวเทียมวัดได้ไม่ชัด เช่น นาข้าว บ่อเลี้ยงสัตว์น้ำ และแหล่งน้ำ (ราว 29% ของพื้นที่ศึกษา) เติมสีด้วยค่าประมาณ IDW ให้เต็มสามจังหวัด ปิดได้ที่ช่องใต้แถบสี การ์ดจะบอกว่าค่าไหนเป็นค่าประมาณ</li>
+    <li>ที่ที่ดาวเทียมวัดได้ไม่ชัด เช่น นาข้าว บ่อเลี้ยงสัตว์น้ำ และแหล่งน้ำ (ราว 29% ของพื้นที่ศึกษา) เติมสีด้วยค่าประมาณจากสิ่งปกคลุมดินและจุดวัดรอบ ๆ ให้เต็มสามจังหวัด ปิดได้ที่ช่องใต้แถบสี การ์ดจะบอกว่าค่าไหนเป็นค่าประมาณ</li>
     <li>สีของอาคารมาจากอัตราทรุดของพื้นที่รอบอาคาร (ช่องละ 80 ม.) ไม่ได้วัดตัวอาคารแต่ละหลัง</li></ul>
-    <h4>การเติมช่องว่างด้วย IDW</h4>
-    <p>ช่องที่ไม่มีค่าในพื้นที่ศึกษาประมาณจากจุดวัดที่ใกล้ที่สุด 12 จุด ถ่วงน้ำหนักด้วย 1/ระยะทาง² (Inverse Distance Weighting) ใช้เฉพาะจุดวัดที่ค่าไม่แน่นอนไม่เกิน 5 มม. ต่อปี ครึ่งหนึ่งของช่องที่เติมอยู่ห่างจุดวัดไม่เกิน 230 ม. และ 95% ไม่เกิน 1.6 กม. ทดสอบโดยซ่อนจุดวัดจริงแล้วประมาณกลับ คลาดเฉลี่ย 1.4 มม. ต่อปีเมื่อจุดวัดที่ใช้ห่างเกิน 250 ม. และ 1.7 มม. ต่อปีเมื่อห่างเกิน 500 ม. ยิ่งไกลจุดวัดยิ่งคลาดมากขึ้น ค่าประมาณไม่ได้ใช้ในตารางสรุปรายเขต การจัดอันดับ และ exposure</p>
+    <h4>การเติมช่องว่าง</h4>
+    <p>ช่องที่ดาวเทียมวัดไม่ได้ส่วนใหญ่เป็นบ่อเลี้ยงสัตว์น้ำ นาข้าว และแหล่งน้ำ ซึ่งไม่เหมือนเมืองหรือถนนข้าง ๆ การเฉลี่ยจากจุดวัดรอบ ๆ อย่างเดียว (IDW) จึงยืมค่าจากพื้นที่ที่ทรุดคนละแบบ เราจึงเติมสองชั้น (regression kriging แบบง่าย): (1) แบบจำลอง gradient boosting เรียนอัตราทรุดของช่องที่วัดได้ 336,732 ช่องจากสัดส่วนสิ่งปกคลุมดิน ESA WorldCover 2021 (10 ม.) ในช่องและรอบ ๆ (ราว 0.5 และ 2 กม.) จำนวนอาคาร ประชากร WorldPop 2025 ความสูง DeltaDTM ระยะถึงทะเลและแหล่งน้ำ และตำแหน่ง (แนวโน้มระดับภูมิภาคจากการสูบน้ำบาดาล) (2) ส่วนต่างระหว่างค่าวัดกับแบบจำลองของจุดวัดใกล้ ๆ บวกกลับโดยลดลงตามระยะ (ครึ่งหนึ่งที่ราว 1 กม.) ใกล้จุดวัดค่าจึงต่อกับค่าวัด ไกลออกไปขึ้นกับสิ่งปกคลุมดินเป็นหลัก ทดสอบโดยซ่อนจุดวัดทั้งบล็อก 3 × 3 กม. แล้วประมาณกลับ: คลาดเฉลี่ย 1.7 มม. ต่อปี (IDW 2.0) และในช่องที่เป็นบ่อหรือนาเป็นส่วนใหญ่ 2.9 มม. ต่อปี (IDW 3.3) IDW ประเมินการทรุดในบ่อและนาต่ำไปเฉลี่ย 0.65 มม. ต่อปี วิธีใหม่ไม่เอียง ช่องที่เติมคิดเป็น 29% ของพื้นที่ศึกษา ครึ่งหนึ่งห่างจุดวัดไม่เกิน 220 ม. และ 95% ไม่เกิน 1.6 กม. ค่าเติมไม่ได้ใช้ในตารางสรุปรายเขต การจัดอันดับ และ exposure</p>
     <h4>แผนที่ความเสี่ยง</h4>
-    <p>ความเสี่ยง = <b>ภัย × การสัมผัสภัย × ความเปราะบาง</b> (กรอบของ UNDRR) คำนวณทุกช่องขนาด 100 × 100 ม. แต่ละส่วนปรับเป็น 0–1 เทียบกันทั้งพื้นที่ศึกษา แล้วแบ่งช่องที่มีคนหรืออาคารเป็น 5 ระดับเท่า ๆ กัน (ระดับละ 20%) จึงเป็น<b>ความเสี่ยงเปรียบเทียบ</b> ไม่ใช่ความน่าจะเป็นของความเสียหาย</p>
+    <p>ความเสี่ยง = <b>ภัย × การสัมผัสภัย × ความเปราะบาง</b> (กรอบของ UNDRR) คำนวณทุกช่องขนาด 100 × 100 ม. แต่ละส่วนปรับเป็น 0–1 เทียบกันทั้งพื้นที่ศึกษา แล้วแบ่งช่องที่มีคนหรืออาคารเป็น 5 ระดับเท่า ๆ กัน (ระดับละ 20%) จึงเป็น<b>ความเสี่ยงเปรียบเทียบ</b> ไม่ใช่ความน่าจะเป็นของความเสียหาย ช่องที่ดาวเทียมวัดไม่ได้ใช้อัตราทรุดจากค่าเติม และช่องที่ไม่มีคนหรืออาคารก็จัดระดับด้วยเกณฑ์เดียวกัน (มักต่ำมาก) แผนที่จึงเต็มพื้นที่ศึกษา ช่องเดิมได้ระดับเท่าเดิมทุกช่อง การ์ดบอกว่าช่องไหนใช้ค่าเติม</p>
     <ul><li><b>ภัย</b>: อัตราทรุด, การทรุดไม่เท่ากันที่อาจกระทบอาคาร (angular distortion), น้ำท่วม 21 ต.ค. 2569 บริเวณใกล้เคียง</li>
     <li><b>คนและอาคาร</b>: จำนวนคนและพื้นที่อาคารในช่อง, จำนวนโรงเรียน โรงพยาบาล สถานีดับเพลิง สถานีตำรวจ และสถานีรถไฟในรัศมี 500 ม.</li>
     <li><b>ความเปราะบาง</b> (ในรัศมี 500 ม.): สัดส่วนผู้สูงอายุ 65 ปีขึ้นไป, เด็กอายุต่ำกว่า 5 ปี (WorldPop 2025), อาคารเตี้ยไม่เกิน 6 ม. (บ้านแนวราบมักใช้เสาเข็มสั้น) และระยะทางถึงโรงพยาบาลที่ใกล้ที่สุด</li></ul>
     <h4>น้ำท่วมจากทะเลในอนาคต</h4>
-    <p>จำลองด้วยแบบจำลองชลศาสตร์ 2 มิติ SFINCS (Deltares) บนกริด 100 ม. ปล่อยน้ำทะเลเข้าจากอ่าวไทยตามระดับน้ำจริงทุก 10 นาที (น้ำขึ้นลง + คลื่นพายุ จาก GTSM ของ Copernicus) ช่วงน้ำขึ้นสูงสุดของปี 2567 (24 มิ.ย., +2.0 ม. ที่ปากแม่น้ำ) แล้วบวกระดับน้ำทะเลที่สูงขึ้นตาม IPCC AR6 (ค่ากลาง ฉบับที่ไม่รวมการเคลื่อนตัวของแผ่นดิน) ภูมิประเทศมาจาก DeltaDTM ปรับเป็นความสูงเหนือระดับน้ำทะเล (+1.08 ม. จาก EGM2008) แล้วลบการทรุดสะสมตามอัตราจาก InSAR น้ำต้องไหลผ่านพื้นที่ที่ต่อเนื่องกันจริง และถูกกั้นด้วยพื้นที่สูงหรือคันกั้นน้ำ</p>
+    <p>จำลองด้วยแบบจำลองชลศาสตร์ 2 มิติ SFINCS (Deltares) บนกริด 100 ม. ปล่อยน้ำทะเลเข้าจากอ่าวไทยตามระดับน้ำจริงทุก 10 นาที (น้ำขึ้นลง + คลื่นพายุ จาก GTSM ของ Copernicus) ช่วงน้ำขึ้นสูงสุดของปี 2567 (24 มิ.ย., +2.0 ม. ที่ปากแม่น้ำ) แล้วบวกระดับน้ำทะเลที่สูงขึ้นตาม IPCC AR6 (ค่ากลาง ฉบับที่ไม่รวมการเคลื่อนตัวของแผ่นดิน) ภูมิประเทศมาจาก DeltaDTM ปรับเป็นความสูงเหนือระดับน้ำทะเล (+1.08 ม. จาก EGM2008) แล้วลบการทรุดสะสมตามอัตราจาก InSAR (ช่องที่วัดไม่ได้ใช้ค่าเติมเดียวกับแผนที่อัตราทรุด) น้ำต้องไหลผ่านพื้นที่ที่ต่อเนื่องกันจริง และถูกกั้นด้วยพื้นที่สูงหรือคันกั้นน้ำ</p>
+    <p>ปุ่มปีคือปัจจุบัน (2569) และ 10 กับ 20 ปีข้างหน้า (2579, 2589) ระดับน้ำทะเลตาม AR6 สูงกว่าปี 2567 อยู่ 5.5 และ 11.1 ซม. (SSP2-4.5) หรือ 6.7 และ 13.5 ซม. (SSP5-8.5) สองฉากทัศน์จึงต่างกันเพียง 1–2 ซม. ในช่วงนี้ ความต่างหลักมาจากการทรุดซึ่งเท่ากับ 10–20 ปีของอัตราในแผนที่</p>
     <p>กรณี "มีคัน" ใส่กำแพงริมแม่น้ำเจ้าพระยาสูง +2.8 ม. (ค่าออกแบบของ กทม.) และแนวถนนสุขุมวิทชายฝั่งสมุทรปราการ +2.5 ม. (สมมติ) ซึ่งทรุดลงตามพื้นดินในกรณี "ทรุดต่อ" ไม่มีข้อมูลแนวคันพระราชดำริและคันริมแม่น้ำท่าจีน จึงไม่ได้ใส่ แบบจำลองไม่รวมฝน น้ำเหนือ และเครื่องสูบน้ำ ผลจึงใช้เปรียบเทียบระหว่างฉากทัศน์ ไม่ใช่การพยากรณ์น้ำท่วมรายจุด</p>
-    <p>ตรวจความต่อเนื่องของน้ำท่วมชายฝั่ง: ช่องแผ่นดินที่ติดทะเลทั้งแนว (ราว 80 กม. จากสมุทรสาครถึงสมุทรปราการ) ถูกน้ำท่วมครบทุกช่องในทุกฉากทัศน์ แนวน้ำท่วมจึงต่อเนื่องตลอดชายฝั่ง ขาดเฉพาะตรงร่องแม่น้ำเจ้าพระยาซึ่งเป็นน้ำอยู่แล้ว ปุ่มปีแสดงว่าล่วงหน้าจากปี 2569 กี่ปี</p>
+    <p>แผนที่แสดงเฉพาะน้ำท่วมที่ต่อเนื่องจากทะเลผ่านพื้นที่ที่ท่วมด้วยกัน แอ่งที่ท่วมแยกอยู่ในแผ่นดิน หรือเชื่อมกับทะเลผ่านร่องแม่น้ำและคลองเท่านั้น (เช่น หนองจอก ลาดกระบัง ดอนเมือง) ตัดออก เพราะเกิดจากความคลาดของ DEM หรือน้ำที่ล้นตามลำน้ำ ไม่ใช่แนวน้ำทะเลที่ขึ้นมาจริง (ตัดออก 7–10 ตร.กม. ในกรณีมีคัน และ 46–54 ตร.กม. ในกรณีไม่มีคัน) บ่อ คลอง และแม่น้ำที่อยู่ภายในแนวน้ำท่วมระบายสีตามความลึกของช่องข้างเคียง (ไม่เกิน 500 ม.) แนวจึงไม่เป็นรู</p>
+    <p>ตรวจความต่อเนื่องของน้ำท่วมชายฝั่ง: ช่องแผ่นดินที่ติดทะเลทั้งแนว (ราว 80 กม. จากสมุทรสาครถึงสมุทรปราการ) ถูกน้ำท่วมครบ 100% ในทั้ง 18 ฉากทัศน์ และน้ำท่วมเป็นแนวเดียวกันสองฝั่งของร่องแม่น้ำเจ้าพระยา (ชิ้นเล็กที่เหลือรวม 0.04 ตร.กม.)</p>
     <h4>สถานที่และเหตุการณ์สำคัญ</h4>
     <p>จุดสีดำคือสถานที่สำคัญ (ตำแหน่งจาก OpenStreetMap) จุดสีตามประเภทคือโรงเรียน มหาวิทยาลัย โรงพยาบาล สถานีตำรวจ สถานีดับเพลิง สถานีรถไฟ และสนามบิน 1,538 แห่งที่ใช้ประเมิน exposure ค่าที่การ์ดคืออัตราทรุดเฉลี่ยรอบสถานที่ (จุด: ถ่วงน้ำหนักในรัศมี 500 ม.; พื้นที่: ภายในขอบเขต) พร้อมช่วงตามความไม่แน่นอนและระดับการทรุดไม่เท่ากัน (β) จุดสีแดงคือเหตุการณ์สำคัญที่เกี่ยวกับการทรุดและน้ำท่วม</p>
     <h4>น้ำท่วม</h4>
@@ -466,19 +474,21 @@ const ABOUT = {
     <ul><li>The ± is an approximate uncertainty: the statistical error combined with half the difference between the two satellite orbits.</li>
     <li>Values are millimetres per year. 15 mm a year means about 15 cm lower after 10 years if the rate continues.</li>
     <li>Colours show how fast the ground sinks, not whether buildings will be damaged. Damage depends on foundations and on uneven sinking over short distances.</li>
-    <li>Spots the satellite cannot measure reliably, such as rice fields, fish ponds and water (about 29% of the study area), are filled with IDW estimates so the three provinces are fully covered. Untick the box under the colour bar to hide them; the card says when a value is an estimate.</li>
+    <li>Spots the satellite cannot measure reliably, such as rice fields, fish ponds and water (about 29% of the study area), are filled with estimates from land cover and nearby measurements so the three provinces are fully covered. Untick the box under the colour bar to hide them; the card says when a value is an estimate.</li>
     <li>Building colours come from the rate of the surrounding 80 m cell, not from each building itself.</li></ul>
-    <h4>Filling gaps with IDW</h4>
-    <p>Cells without a measurement inside the study area are estimated from the 12 nearest measurements weighted by 1/distance² (inverse distance weighting), using only measurements with uncertainty up to 5 mm a year. Half of the filled cells are within 230 m of a measurement and 95% within 1.6 km. Hiding real measurements and estimating them back gives a mean error of 1.4 mm a year when the nearest measurement used is over 250 m away and 1.7 mm a year when over 500 m away; errors grow with distance. Estimates are not used in the district tables, rankings or exposure figures.</p>
+    <h4>Filling the gaps</h4>
+    <p>Most cells the satellite cannot measure are fish ponds, rice fields and water, which behave differently from the towns and roads next to them, so averaging nearby measurements alone (IDW) borrows values from land that sinks differently. The gaps are filled in two layers (a simple regression kriging): (1) a gradient-boosting model learns the sinking rate of the 336,732 measured cells from ESA WorldCover 2021 (10 m) land-cover shares in and around the cell (about 0.5 and 2 km), building count, WorldPop 2025 population, DeltaDTM height, distance to the sea and to water, and position (the regional pattern of groundwater pumping); (2) the difference between measurement and model at nearby measured cells is added back, fading with distance (half at about 1 km), so values join the measurements near them and depend mainly on land cover further away. Hiding whole 3 × 3 km blocks of measurements and estimating them back gives a mean error of 1.7 mm a year (IDW 2.0), and 2.9 mm a year in cells that are mostly ponds or fields (IDW 3.3). IDW underestimates sinking in ponds and fields by 0.65 mm a year on average; the new method shows no bias. Filled cells make up 29% of the study area; half are within 220 m of a measurement and 95% within 1.6 km. Estimates are not used in the district tables, rankings or exposure figures.</p>
     <h4>Risk map</h4>
-    <p>Risk = <b>hazard × exposure × vulnerability</b> (UNDRR framework), computed for every 100 × 100 m cell. Each part is scaled 0–1 across the study area and cells with people or buildings are split into 5 equal classes (20% each), so it shows <b>relative risk</b>, not a probability of damage.</p>
+    <p>Risk = <b>hazard × exposure × vulnerability</b> (UNDRR framework), computed for every 100 × 100 m cell. Each part is scaled 0–1 across the study area and cells with people or buildings are split into 5 equal classes (20% each), so it shows <b>relative risk</b>, not a probability of damage. Cells the satellite cannot measure use the filled sinking rate, and cells without people or buildings are classed with the same edges (usually very low), so the map covers the whole study area; previously classed cells keep their class. The card says when a cell uses the estimate.</p>
     <ul><li><b>Hazard</b>: sinking rate, uneven sinking that can affect buildings (angular distortion), flooding nearby on 21 Oct 2026</li>
     <li><b>People and buildings</b>: people and building area in the cell, and schools, hospitals, fire and police stations and rail stations within 500 m</li>
     <li><b>Vulnerability</b> (within 500 m): share aged 65+, share under 5 (WorldPop 2025), low buildings up to 6 m (houses often on short piles), and distance to the nearest hospital</li></ul>
     <h4>Future flooding from the sea</h4>
-    <p>Simulated with the 2D hydrodynamic model SFINCS (Deltares) on a 100 m grid. Sea water enters from the Gulf of Thailand following real 10-minute water levels (tide + storm surge, Copernicus GTSM) during the highest tide of 2024 (24 June, +2.0 m at the river mouth), plus IPCC AR6 sea-level rise (median, version without land motion). Ground height comes from DeltaDTM converted to height above sea level (+1.08 m from EGM2008), minus accumulated sinking at the InSAR rate. Water must flow through connected low ground and is stopped by higher land or dikes.</p>
+    <p>Simulated with the 2D hydrodynamic model SFINCS (Deltares) on a 100 m grid. Sea water enters from the Gulf of Thailand following real 10-minute water levels (tide + storm surge, Copernicus GTSM) during the highest tide of 2024 (24 June, +2.0 m at the river mouth), plus IPCC AR6 sea-level rise (median, version without land motion). Ground height comes from DeltaDTM converted to height above sea level (+1.08 m from EGM2008), minus accumulated sinking at the InSAR rate (unmeasured cells use the same filled rate as the sinking map). Water must flow through connected low ground and is stopped by higher land or dikes.</p>
+    <p>The year buttons are today (2026) and 10 and 20 years ahead (2036, 2046). AR6 sea level is 5.5 and 11.1 cm above 2024 (SSP2-4.5) or 6.7 and 13.5 cm (SSP5-8.5), so the two scenarios differ by only 1–2 cm over this period; the main difference comes from sinking, which is 10–20 years of the mapped rate.</p>
     <p>"With dikes" adds Chao Phraya flood walls at +2.8 m (BMA design value) and the Sukhumvit coastal road in Samut Prakan at +2.5 m (assumed); they sink with the ground when sinking continues. The King's Dike and Tha Chin river walls are not included for lack of data. Rain, river floods and pumping are not modelled, so the results compare scenarios rather than forecast flooding at a given spot.</p>
-    <p>Coastal continuity check: every land cell touching the sea along the whole coast (about 80 km from Samut Sakhon to Samut Prakan) floods in every scenario, so the flooded band is continuous along the shore, broken only by the Chao Phraya channel, which is water already. The year buttons show how many years ahead of 2026 each run is.</p>
+    <p>The map shows only flooding that connects to the sea through other flooded land. Patches that flood on their own inland, or reach the sea only along a river or canal channel (for example Nong Chok, Lat Krabang, Don Mueang), are removed because they come from DEM errors or water spilling along channels rather than the sea rising over land (7–10 km² removed with dikes, 46–54 km² without). Ponds, canals and rivers inside the flooded band take the depth of the nearest flooded cell (within 500 m), so the band has no holes.</p>
+    <p>Coastal continuity check: 100% of the land cells touching the sea along the whole coast (about 80 km from Samut Sakhon to Samut Prakan) flood in all 18 scenarios, and the flooding forms one band on each side of the Chao Phraya channel (remaining specks total 0.04 km²).</p>
     <h4>Key places and events</h4>
     <p>Black dots are key places (positions from OpenStreetMap). Dots coloured by type are the 1,538 schools, universities, hospitals, police and fire stations, rail stations and airports used in the exposure analysis; the card gives the average sinking around the site (points: weighted within 500 m; areas: within the outline), its range with uncertainty and the uneven-sinking class (β). Red dots are key events related to sinking and flooding.</p>
     <h4>Flooding</h4>
@@ -497,8 +507,8 @@ const ABOUT = {
     <p class="close-row"><button class="btn" id="aboutClose">Close</button></p>`,
 };
 
-let lang = 'th', meta, grid, series, districtsGeo, chart, last = null, riskGrid = null, uncGrid = null, flGrid = null, flName = null, mode = 'sub', ssp = 'ssp245', slrYear = 2050, subOn = 'sub', defOn = 'def';
-let idwOn = true, idwGrid = null;
+let lang = 'th', meta, grid, series, districtsGeo, chart, last = null, riskGrid = null, uncGrid = null, flGrid = null, flName = null, mode = 'sub', ssp = 'ssp245', slrYear = 2036, subOn = 'sub', defOn = 'def';
+let idwOn = true, idwGrid = null, riskxGrid = null;
 const T = k => I18N[lang][k];
 // ---- สถานที่และเหตุการณ์สำคัญ ----
 const FAC_COLORS = { school: '#3b7dd8', university: '#7a5195', hospital: '#d6336c', police: '#1d3557', fire_station: '#f77f00', rail_station: '#2a9d8f', airport: '#6c757d' };
@@ -603,8 +613,8 @@ function legendHTML() {
     <div class="ticks">${ticks}</div>
     <div class="nod"><i style="background:${meta.colors[0]}"></i>${T('stable')}</div>
     <div class="nod"><i style="background:${meta.colors[3]};opacity:.35"></i>${T('faint')}</div>
-    ${meta.idw ? `<label class="chk"><input type="checkbox" id="l-idw"${idwOn ? ' checked' : ''}> <span>${T('idwL')}</span></label>` : ''}
-    ${!meta.idw || !idwOn ? `<div class="nod"><i></i>${T('nod')}</div>` : ''}`;
+    ${meta.fill ? `<label class="chk"><input type="checkbox" id="l-idw"${idwOn ? ' checked' : ''}> <span>${T('idwL')}</span></label>` : ''}
+    ${!meta.fill || !idwOn ? `<div class="nod"><i></i>${T('nod')}</div>` : ''}`;
 }
 
 function renderBldLegend() {
@@ -645,13 +655,13 @@ function uncAt(lng, lat) {
   const q = uncGrid[r * grid.w + c];
   return q === -32768 ? null : { u: (q % 10000) / 10, faded: q >= 10000 };
 }
-// ค่าประมาณ IDW ในช่องที่ดาวเทียมวัดไม่ได้ (idw.bin: สองค่าต่อช่อง = อัตรา × 10, ระยะถึงจุดวัด × 100 ม.)
+// ค่าเติมในช่องที่ดาวเทียมวัดไม่ได้ (fill.bin: สามค่าต่อช่อง = อัตรา × 10, ระยะถึงจุดวัด ÷ 100 ม., สิ่งปกคลุมดินหลัก 1–9)
 function idwAt(lng, lat) {
   if (!idwGrid || !idwOn) return null;
   const c = Math.floor((lng - grid.x0) / grid.dx), r = Math.floor((lat - grid.y0) / grid.dy);
   if (c < 0 || r < 0 || c >= grid.w || r >= grid.h) return null;
-  const k = (r * grid.w + c) * 2;
-  return idwGrid[k] === -32768 ? null : { v: idwGrid[k] / 10, d: idwGrid[k + 1] * 100 };
+  const k = (r * grid.w + c) * 3;
+  return idwGrid[k] === -32768 ? null : { v: idwGrid[k] / 10, d: idwGrid[k + 1] * 100, lc: idwGrid[k + 2] };
 }
 function applyIdw() {
   if (map.getLayer('ss-idw')) map.setLayoutProperty('ss-idw', 'visibility', mode === 'sub' && idwOn ? 'visible' : 'none');
@@ -681,8 +691,8 @@ function riskAt(lng, lat) {
   if (!riskGrid) return null;
   const g = riskGrid, c = Math.floor((lng - g.x0) / g.dx), r = Math.floor((lat - g.y0) / g.dy);
   if (c < 0 || r < 0 || c >= g.w || r >= g.h) return null;
-  const k = (r * g.w + c) * 4;
-  return g.data[k] === 255 ? null : [g.data[k], g.data[k + 1], g.data[k + 2], g.data[k + 3]];
+  const k = (r * g.w + c) * 4, x = riskxGrid ? riskxGrid[r * g.w + c] : 0;
+  return g.data[k] === 255 ? null : [g.data[k], g.data[k + 1], g.data[k + 2], g.data[k + 3], x];
 }
 function inRing(x, y, ring) {
   let ins = false;
@@ -721,8 +731,8 @@ function showCard(info) {
   if (info.lnglat && info.risk === undefined) info.risk = riskAt(...info.lnglat);
   if (info.lnglat && info.unc === undefined) info.unc = uncAt(...info.lnglat);
   if (info.v0 === undefined) info.v0 = info.v ?? null;
-  info.v = info.v0; info.idw = null;
-  if (info.v0 === null && info.lnglat) { const e = idwAt(...info.lnglat); if (e) { info.v = e.v; info.idw = e.d; } }
+  info.v = info.v0; info.idw = null; info.lc = 0;
+  if (info.v0 === null && info.lnglat) { const e = idwAt(...info.lnglat); if (e) { info.v = e.v; info.idw = e.d; info.lc = e.lc; } }
   const d = info.district, v = info.v, cl = classOf(v);
   const place = d ? `${dName(d)}, ${pName(d)}` : T('outside');
   $('cPlace').textContent = info.h ? `${T('building')(info.h)}, ${place}` : place;
@@ -738,7 +748,7 @@ function showCard(info) {
         <div class="cls"><i style="background:${meta.colors[cl]}"></i>${T('cls')[cl]}</div>
         <p id="cExpl">${T('expl')[cl]} ${T('tenYr')(fmt(cm, 0), T('step')(steps))}</p>
         ${info.unc && info.unc.faded ? `<p class="warn">${T('uncWarn')}</p>` : ''}
-        ${info.idw !== null ? `<p class="warn">${T('idwWarn')(distTxt(info.idw))}</p>` : ''}</div>
+        ${info.idw !== null ? `<p class="warn">${T('idwWarn')(distTxt(info.idw), T('lcN')[info.lc - 1] || '')}</p>` : ''}</div>
       <figure class="gauge" style="margin:0">${gaugeSVG(cm)}<figcaption>−${fmt(cm, 0)} ${lang === 'th' ? 'ซม.' : 'cm'}<br><span style="color:var(--muted);font-weight:500">${T('gaugeCap')}</span></figcaption></figure></div>`;
   }
   const dep = mode === 'slr' && info.lnglat ? depthAt(...info.lnglat) : null;
@@ -747,10 +757,10 @@ function showCard(info) {
       <p class="slr-sum">${T('slrNote')}</p></div>`;
   }
   if (info.risk) {
-    const [rc, H, E, V] = info.risk, k = [H, E, V].indexOf(Math.max(H, E, V));
+    const [rc, H, E, V, rx] = info.risk, k = [H, E, V].indexOf(Math.max(H, E, V));
     h += `<div class="block"><h3>${T('riskT')}: <span style="color:${rc >= 3 ? 'var(--staff)' : 'inherit'}">${T('rcls')[rc]}</span></h3>
       <p class="why">${rc >= 2 ? T('why')[k] : ''}</p>
-      <div class="bars">${T('hev').map((n, i) => `<span>${n}</span><div class="bar"><span style="width:${[H, E, V][i]}%"></span></div>`).join('')}</div></div>`;
+      <div class="bars">${T('hev').map((n, i) => `<span>${n}</span><div class="bar"><span style="width:${[H, E, V][i]}%"></span></div>`).join('')}</div>${rx === 1 || rx === 2 ? `<p class="warn">${T('riskX')[rx - 1]}</p>` : ''}</div>`;
   }
   if (d) {
     const total = series.districts[d.i] ? -series.districts[d.i].filter(x => x !== null).slice(-3).reduce((a, b) => a + b, 0) / 3 / 10 : null;
@@ -992,18 +1002,19 @@ map.on('load', async () => {
   map.addSource('ss-img', { type: 'image', url: 'vlm.png', coordinates: meta.image });
   map.addLayer({ id: 'ss-img', type: 'raster', source: 'ss-img',
     paint: { 'raster-opacity': ['interpolate', ['linear'], ['zoom'], 12, 0.85, 14.5, 0.35], 'raster-resampling': 'nearest' } }, firstSymbol);
-  if (meta.idw) {
-    // ช่องว่างของ InSAR เติมด้วย IDW (สร้างโดย scripts/idw_fill.py) วางใต้ภาพค่าที่วัดได้
-    map.addSource('ss-idw', { type: 'image', url: 'vlm_idw.png', coordinates: meta.idw.image });
+  if (meta.fill) {
+    // ช่องว่างของ InSAR เติมด้วยแบบจำลองจากสิ่งปกคลุมดิน + ค่าวัดรอบข้าง (scripts/vlm_fill.py) วางใต้ภาพค่าที่วัดได้
+    map.addSource('ss-idw', { type: 'image', url: 'vlm_fill.png', coordinates: meta.fill.image });
     map.addLayer({ id: 'ss-idw', type: 'raster', source: 'ss-idw',
       paint: { 'raster-opacity': ['interpolate', ['linear'], ['zoom'], 12, 0.85, 14.5, 0.35], 'raster-resampling': 'nearest' } }, 'ss-img');
-    try { idwGrid = new Int16Array(await fetch('idw.bin').then(r => r.arrayBuffer())); } catch (err) { idwGrid = null; }
+    try { idwGrid = new Int16Array(await fetch('fill.bin').then(r => r.arrayBuffer())); } catch (err) { idwGrid = null; }
   }
   if (meta.risk) {
     map.addSource('ss-risk', { type: 'image', url: 'risk.png', coordinates: meta.risk.image });
     map.addLayer({ id: 'ss-risk', type: 'raster', source: 'ss-risk', layout: { visibility: 'none' },
       paint: { 'raster-opacity': ['interpolate', ['linear'], ['zoom'], 12, 0.88, 14.5, 0.4], 'raster-resampling': 'nearest' } }, firstSymbol);
     riskGrid = { ...meta.risk.grid, data: new Uint8Array(await fetch('risk.bin').then(r => r.arrayBuffer())) };
+    try { riskxGrid = new Uint8Array(await fetch('riskx.bin').then(r => r.arrayBuffer())); } catch (err) { riskxGrid = null; }
     $('m-risk').hidden = false;
   }
   if (meta.sfl) {
