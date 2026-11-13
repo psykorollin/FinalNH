@@ -1,0 +1,64 @@
+# SFINCS sea-flood runs for docs/sea_flood_sfincs.md (inputs written by sf_setup.py; one job per run, in parallel).
+# Each job saves hmax (max water depth, raw SFINCS grid order) as results/<run>/hmax.npz; the collect job commits them here.
+name: sfincs-runs
+on:
+  push:
+    branches: [sfincs-runs]
+    paths: ['runs/**', '.github/workflows/sfincs.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency: sfincs-runs
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    strategy:
+      fail-fast: false
+      matrix:
+        name: ["now_def", "now_undef", "2036_ssp245_sub_def", "2036_ssp245_sub_undef", "2036_ssp245_nosub_def", "2036_ssp245_nosub_undef", "2036_ssp585_sub_def", "2036_ssp585_sub_undef", "2036_ssp585_nosub_def", "2036_ssp585_nosub_undef", "2046_ssp245_sub_def", "2046_ssp245_sub_undef", "2046_ssp245_nosub_def", "2046_ssp245_nosub_undef", "2046_ssp585_sub_def", "2046_ssp585_sub_undef", "2046_ssp585_nosub_def", "2046_ssp585_nosub_undef"]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: runs/${{ matrix.name }}
+          sparse-checkout-cone-mode: false
+      - name: Run SFINCS v2.5.0
+        run: |
+          cd runs/${{ matrix.name }}
+          nproc
+          t0=$(date +%s)
+          docker run --rm -e OMP_NUM_THREADS=$(nproc) -v "$PWD":/data deltares/sfincs-cpu:sfincs-v2.5.0-Hautacam > run.log 2>&1 || { tail -n 40 run.log; exit 1; }
+          echo "seconds $(( $(date +%s) - t0 ))" | tee -a run.log
+          tail -n 15 run.log
+      - name: Extract hmax
+        run: |
+          pip install --quiet h5py numpy
+          cd runs/${{ matrix.name }}
+          sudo chmod -R a+rw .
+          python -c "import h5py, numpy as np; h = h5py.File('sfincs_map.nc', 'r')['hmax'][:].squeeze().astype('float32'); np.savez_compressed('hmax.npz', hmax=h); print(h.shape, float(np.nanmax(h)))"
+          mkdir -p ../../out/${{ matrix.name }} && cp hmax.npz run.log ../../out/${{ matrix.name }}/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: hmax-${{ matrix.name }}
+          path: out/
+  collect:
+    needs: run
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: .github
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: hmax-*
+          merge-multiple: true
+          path: results/
+      - name: Commit results
+        run: |
+          ls -R results | head -60
+          git config user.name github-actions
+          git config user.email github-actions@users.noreply.github.com
+          git add --sparse results
+          git commit -m "SFINCS hmax for $(ls results | wc -l) runs" || exit 0
+          git push
