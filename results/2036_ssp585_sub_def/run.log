@@ -1,0 +1,127 @@
+Unable to find image 'deltares/sfincs-cpu:sfincs-v2.5.0-Hautacam' locally
+sfincs-v2.5.0-Hautacam: Pulling from deltares/sfincs-cpu
+30d054a8d33f: Pulling fs layer
+b73304fe4df3: Pulling fs layer
+0626d3cc316c: Pulling fs layer
+be5ba4f0c04f: Pulling fs layer
+30d054a8d33f: Download complete
+0626d3cc316c: Download complete
+be5ba4f0c04f: Download complete
+0626d3cc316c: Pull complete
+b73304fe4df3: Download complete
+30d054a8d33f: Pull complete
+be5ba4f0c04f: Pull complete
+b73304fe4df3: Pull complete
+Digest: sha256:ad4f57175b317ec51b8fe6bc3af5079f958c206ffe1308fbce5bc7e8abc479f3
+Status: Downloaded newer image for deltares/sfincs-cpu:sfincs-v2.5.0-Hautacam
+
+------------ Welcome to SFINCS ------------
+
+  @@@@@  @@@@@@@ @@ @@  @@   @@@@   @@@@@
+ @@@ @@@ @@@@@@@ @@ @@@ @@ @@@@@@@ @@@ @@@
+ @@@     @@      @@ @@@ @@ @@   @@ @@@
+  @@@@@  @@@@@@  @@ @@@@@@ @@       @@@@@
+     @@@ @@      @@ @@ @@@ @@   @@     @@@
+ @@@ @@@ @@      @@ @@  @@  @@@@@@ @@@ @@@
+  @@@@@  @@      @@ @@   @   @@@@   @@@@@
+
+              ..............
+          ......:@@@@@@@@:......
+       ..::::..@@........@@.:::::..
+     ..:::::..@@..::..::..@@.::::::..
+    .::::::..@@............@@.:::::::.
+   .::::::..@@..............@@.:::::::.
+  .::::::::..@@............@@..::::::::.
+ .:::::::::...@@.@..@@..@.@@..::::::::::.
+ .:::::::::...:@@@..@@..@@@:..:::::::::..
+ ............@@.@@..@@..@@.@@............
+ ^^^~~^^~~^^@@..............@@^^^~^^^~~^^
+ .::::::::::@@..............@@.:::::::::.
+  .......:.@@.....@.....@....@@.:.......
+   .::....@@......@.@@@.@....@@.....::.
+    .:::~@@.:...:.@@...@@.:.:.@@~::::.
+     .::~@@@@@@@@@@.....@@@@@@@@@~::.
+       ..:~~~~~~~:.......:~~~~~~~:..
+          ......................
+              ..............
+
+------------------------------------------
+
+By running a SFINCS pre-compiled executable
+provided by Deltares, you accept the
+conditions of the Deltares SFINCS FreeWare
+Software License Agreement, see:
+https://download.deltares.nl/sfincs
+
+------------------------------------------
+
+Build-Revision: $Rev: v2.5.0 Hautacam Release 2026.02
+Build-Date: $Date: 2026-10-30
+
+------ Preparing model simulation --------
+
+ Warning : sfincs.inp keyword "dtout" is deprecated, use "dtmapout" instead
+------------------------------------------
+Computational mesh
+------------------------------------------
+Number of active z points      :    541643
+Number of active u/v points    :   1081135
+Warning : 420 weir u/v points are crossed by more than one weir, only the highest weir is used, SFINCS will keep running, but check your input
+
+------------------------------------------
+Processes
+------------------------------------------
+Subgrid topography   : no
+Quadtree refinement  : no
+Advection            : no
+Viscosity            : no
+Coriolis             : no
+Wind                 : no
+Atmospheric pressure : no
+Precipitation        : no
+Infiltration         : no
+SnapWave             : no
+Wave paddles         : no
+------------------------------------------
+
+
+---------- Starting simulation -----------
+---- Using 4 of 4 available threads ----
+
+   0% complete,       - s remaining ...
+   5% complete,   599.2 s remaining ...
+  10% complete,   568.6 s remaining ...
+  15% complete,   570.4 s remaining ...
+  20% complete,   619.4 s remaining ...
+  25% complete,   644.8 s remaining ...
+  30% complete,   642.2 s remaining ...
+  35% complete,   622.3 s remaining ...
+  40% complete,   592.5 s remaining ...
+  45% complete,   562.6 s remaining ...
+  50% complete,   530.8 s remaining ...
+  55% complete,   493.1 s remaining ...
+  60% complete,   449.6 s remaining ...
+  65% complete,   401.8 s remaining ...
+  70% complete,   351.3 s remaining ...
+  75% complete,   298.9 s remaining ...
+  80% complete,   244.3 s remaining ...
+  85% complete,   186.9 s remaining ...
+  90% complete,   126.8 s remaining ...
+  95% complete,    64.4 s remaining ...
+ 100% complete,     0.0 s remaining ...
+
+---------- Simulation finished -----------
+
+ Total time                   :   1310.541
+ Time in input                :      0.239
+ Time in simulation           :   1310.303 (100.0%)
+ Time in boundaries           :     14.149 (  1.1%)
+ Time in momentum             :   1117.058 ( 85.3%)
+ Time in structures           :      9.137 (  0.7%)
+ Time in continuity           :    169.476 ( 12.9%)
+ Time in output               :      0.218 (  0.0%)
+
+ Average time step (s)  :      3.477
+
+----------- Closing off SFINCS -----------
+seconds 1317
