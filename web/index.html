@@ -254,8 +254,8 @@
   <button id="lrHead" class="lr-head" type="button" aria-expanded="true" aria-controls="lrBody"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2 8.5 12 14l10-5.5L12 3Z"/><path d="m2 13 10 5.5L22 13"/><path d="m2 17.5 10 5.5 10-5.5" opacity=".55"/></svg><span class="rt" data-i18n="rail">ชั้นข้อมูล</span></button>
   <div id="lrBody" class="lr-body">
     <div class="lr-list">
-      <label class="rl" style="--c:#b5532a" data-i18n-title="lBld"><input type="checkbox" id="l-bld" checked><span class="ri"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 21V5l8-3v19M12 8l8 3v10M2 21h20M7 9h2M7 13h2M7 17h2M15 14h2M15 18h2"/></svg></span><span class="rt" data-i18n="rBld">อาคาร</span></label>
-      <label class="rl" style="--c:#7a4f2e" data-i18n-title="lB3d"><input type="checkbox" id="l-b3d" checked><span class="ri"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 3 7v10l9 5 9-5V7l-9-5Z"/><path d="m3 7 9 5 9-5M12 12v10"/></svg></span><span class="rt" data-i18n="rB3d">3 มิติ</span></label>
+      <label class="rl" style="--c:#b5532a" data-i18n-title="lBld"><input type="checkbox" id="l-bld" checked><span class="ri"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3h8v8H3zM13 3h8v5h-8zM13 10h8v11h-8zM3 13h8v8H3z"/></svg></span><span class="rt" data-i18n="rBld">อาคาร​2 มิติ</span></label>
+      <label class="rl" style="--c:#7a4f2e" data-i18n-title="lB3d"><input type="checkbox" id="l-b3d" checked><span class="ri"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 3 7v10l9 5 9-5V7l-9-5Z"/><path d="m3 7 9 5 9-5M12 12v10"/></svg></span><span class="rt" data-i18n="rB3d">อาคาร​3 มิติ</span></label>
       <label class="rl" style="--c:#1b2629" data-i18n-title="lLm"><input type="checkbox" id="l-lm" checked><span class="ri"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9L12 3Z"/></svg></span><span class="rt" data-i18n="rLm">จุดสำคัญ</span></label>
       <label class="rl" style="--c:#3b7dd8" data-i18n-title="lFac"><input type="checkbox" id="l-fac"><span class="ri"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 3 8v2h18V8l-9-5Z"/><path d="M5 10v8M9.5 10v8M14.5 10v8M19 10v8M3 21h18"/></svg></span><span class="rt" data-i18n="rFac">อาคาร​สาธารณะ</span></label>
       <label class="rl" style="--c:#c41e24" data-i18n-title="lEv"><input type="checkbox" id="l-ev" checked><span class="ri"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 21V4M5 4h11l-2 4 2 4H5"/></svg></span><span class="rt" data-i18n="rEv">เหตุการณ์</span></label>
@@ -384,9 +384,9 @@ const I18N = {
     grpN: n => `${n} เหตุการณ์ แตะเพื่อดูบนแผนที่`, trTot: (a, b) => a === b ? `${a} จุด` : `${a} จุด รวม ${b} เรื่องที่แจ้ง`,
     months: ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'],
     rail: 'ชั้นข้อมูล', railHint: 'เปิด/ปิดอาคาร สถานที่ ถนน และเส้นแบ่งเขตได้ที่แถบ "ชั้นข้อมูล" ทางขวาของแผนที่', bmShort: 'แผนที่',
-    rBld: 'อาคาร', rB3d: '3 มิติ', rLm: 'จุดสำคัญ', rFac: 'อาคาร​สาธารณะ', rEv: 'เหตุการณ์', rDist: 'เขต', rRoad: 'ถนน', rLab: 'ป้ายเขต', rFlood: 'น้ำท่วม', rGfm: 'GFM',
-    lB3d: 'อาคาร 3 มิติเมื่อซูมเข้า (ปิดเพื่อดูอาคารแบบ 2 มิติทุกระดับซูม)',
-    more: 'ชั้นข้อมูลอื่น', lBld: 'อาคาร (ซูมออกเป็น 2 มิติ ซูมเข้าเป็น 3 มิติ)', lRoad: 'ถนน กว้างตามจริง (OpenStreetMap)', lDist: 'เส้นแบ่งเขต/อำเภอ', lLab: 'ป้ายเขตที่ทรุดเร็วที่สุด',
+    rBld: 'อาคาร​2 มิติ', rB3d: 'อาคาร​3 มิติ', rLm: 'จุดสำคัญ', rFac: 'อาคาร​สาธารณะ', rEv: 'เหตุการณ์', rDist: 'เขต', rRoad: 'ถนน', rLab: 'ป้ายเขต', rFlood: 'น้ำท่วม', rGfm: 'GFM',
+    lB3d: 'อาคาร 3 มิติตามความสูงจริง เมื่อซูมเข้าใกล้',
+    more: 'ชั้นข้อมูลอื่น', lBld: 'อาคาร 2 มิติ ไม่มีความสูง เห็นได้เมื่อซูมออก (ถ้าปิด 3 มิติ จะเป็น 2 มิติทุกระดับซูม)', lRoad: 'ถนน กว้างตามจริง (OpenStreetMap)', lDist: 'เส้นแบ่งเขต/อำเภอ', lLab: 'ป้ายเขตที่ทรุดเร็วที่สุด',
     cls: ['ไม่ทรุดหรือยกตัว', 'ทรุดน้อย', 'ทรุดปานกลาง', 'ทรุดสูง', 'ทรุดสูงมาก'],
     expl: [
       'พื้นตรงนี้ไม่ทรุดหรือยกตัวขึ้นเล็กน้อย ซึ่งพบน้อยมากในสามจังหวัดนี้',
@@ -456,9 +456,9 @@ const I18N = {
     grpN: n => `${n} events, tap one to see it on the map`, trTot: (a, b) => a === b ? `${a} points` : `${a} points, ${b} reports in all`,
     months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
     rail: 'Layers', railHint: 'Turn buildings, places, roads and boundaries on or off in the "Layers" bar on the right of the map', bmShort: 'Basemap',
-    rBld: 'Bldgs', rB3d: '3D', rLm: 'Places', rFac: 'Facilities', rEv: 'Events', rDist: 'Districts', rRoad: 'Roads', rLab: 'Labels', rFlood: 'Flood', rGfm: 'GFM',
-    lB3d: '3D buildings when zoomed in (off: flat buildings at every zoom)',
-    more: 'More layers', lBld: 'Buildings (flat when zoomed out, 3D when zoomed in)', lRoad: 'Roads at real width (OpenStreetMap)', lDist: 'District boundaries', lLab: 'Labels for the fastest-sinking districts',
+    rBld: 'Bldg 2D', rB3d: 'Bldg 3D', rLm: 'Places', rFac: 'Facilities', rEv: 'Events', rDist: 'Districts', rRoad: 'Roads', rLab: 'Labels', rFlood: 'Flood', rGfm: 'GFM',
+    lB3d: '3D buildings at their real height, when zoomed in',
+    more: 'More layers', lBld: 'Flat (2D) buildings, seen when zoomed out (flat at every zoom when 3D is off)', lRoad: 'Roads at real width (OpenStreetMap)', lDist: 'District boundaries', lLab: 'Labels for the fastest-sinking districts',
     cls: ['Not sinking or rising', 'Low', 'Moderate', 'High', 'Very high'],
     expl: [
       'The ground here is not sinking or is rising slightly, which is very rare in these provinces.',
@@ -1374,12 +1374,13 @@ map.on('load', async () => {
     set(b.dataset[attr]); document.querySelectorAll(`[data-${attr}]`).forEach(x => x.setAttribute('aria-pressed', x === b)); showFlood(); });
   pick('yr', v => slrYear = +v); pick('ssp', v => ssp = v); pick('sub', v => subOn = v); pick('def', v => defOn = v);
   const bldVis = () => {
-    const on = $('l-bld').checked, d3 = $('l-b3d').checked;
-    vis(['ss-blo'], on);
-    vis(meta.buildings.map((_, i) => `ss-bld${i}`), on && d3);
-    vis(meta.buildings.map((_, i) => `ss-bldf${i}`), on && !d3);
-    $('bldLeg').hidden = !on;
-    if (on && !d3 && map.getPitch() > 0) map.easeTo({ pitch: 0, duration: 600 });
+    // ปุ่ม 2 มิติ: อาคารแบนตอนซูมออก (และตอนซูมเข้าถ้าปิด 3 มิติ) ปุ่ม 3 มิติ: อาคารตามความสูงตั้งแต่ซูม 13
+    const d2 = $('l-bld').checked, d3 = $('l-b3d').checked;
+    vis(['ss-blo'], d2);
+    vis(meta.buildings.map((_, i) => `ss-bld${i}`), d3);
+    vis(meta.buildings.map((_, i) => `ss-bldf${i}`), d2 && !d3);
+    $('bldLeg').hidden = !(d2 || d3);
+    if (!d3 && map.getPitch() > 0) map.easeTo({ pitch: 0, duration: 600 });
   };
   $('l-bld').onchange = bldVis; $('l-b3d').onchange = bldVis;
   $('l-road').onchange = e => { roadsOn = e.target.checked; applyRoads(); };
@@ -1394,7 +1395,7 @@ map.on('load', async () => {
   $('legend').addEventListener('change', e => { if (e.target.id === 'l-idw') { idwOn = e.target.checked; applyIdw(); } });
 });
 
-map.on('zoomend', () => { if (map.getZoom() >= 13 && map.getPitch() < 20 && $('l-bld').checked && $('l-b3d').checked) map.easeTo({ pitch: 50, duration: 600 }); });
+map.on('zoomend', () => { if (map.getZoom() >= 13 && map.getPitch() < 20 && $('l-b3d').checked) map.easeTo({ pitch: 50, duration: 600 }); });
 $('lang').onclick = () => { lang = lang === 'th' ? 'en' : 'th'; applyLang(); renderBm(); };
 $('aboutBtn').onclick = () => $('about').classList.add('open');
 $('about').onclick = e => { if (e.target.id === 'about') $('about').classList.remove('open'); };
