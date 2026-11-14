@@ -268,7 +268,7 @@
   <details>
     <summary data-i18n="more">ชั้นข้อมูลอื่น</summary>
     <label class="chk" id="gfmRow" hidden><input type="checkbox" id="l-gfm"> <span class="sw" style="background:var(--gfm)"></span> <span data-i18n="lGfm">GFM</span></label>
-    <label class="chk"><input type="checkbox" id="l-bld" checked> <span data-i18n="lBld">อาคาร 3 มิติ</span></label>
+    <label class="chk"><input type="checkbox" id="l-bld" checked> <span data-i18n="lBld">อาคาร (ซูมออกเป็น 2 มิติ ซูมเข้าเป็น 3 มิติ)</span></label>
     <label class="chk"><input type="checkbox" id="l-road" checked> <span class="sw" style="background:#cdd1d4"></span> <span data-i18n="lRoad">ถนน</span></label>
     <label class="chk"><input type="checkbox" id="l-dist" checked> <span data-i18n="lDist">ขอบเขต</span></label>
     <label class="chk"><input type="checkbox" id="l-lab" checked> <span data-i18n="lLab">ป้ายจุดที่ทรุดมาก</span></label>
@@ -320,7 +320,7 @@ const I18N = {
     yrL: n => `อีก ${n} ปี`, kmU: 'กม.', mU: 'ม.',
     nod: 'วัดไม่ได้ เช่น นาข้าว บ่อปลา แหล่งน้ำ', stable: 'ไม่ทรุดหรือยกตัว (0 ขึ้นไป)', faint: 'สีจาง = ค่าไม่แน่นอนสูง', riskLo: 'ต่ำมาก', riskHi: 'สูงมาก',
     lFlood: 'น้ำท่วม 21 ต.ค. 2569 จากภาพเรดาร์', lGfm: 'น้ำท่วมวันเดียวกันจาก Copernicus GFM (ใช้เทียบ)',
-    more: 'ชั้นข้อมูลอื่น', lBld: 'อาคาร 3 มิติ (ซูมเข้าใกล้)', lRoad: 'ถนน กว้างตามจริง (OpenStreetMap)', lDist: 'เส้นแบ่งเขต/อำเภอ', lLab: 'ป้ายเขตที่ทรุดเร็วที่สุด',
+    more: 'ชั้นข้อมูลอื่น', lBld: 'อาคาร (ซูมออกเป็น 2 มิติ ซูมเข้าเป็น 3 มิติ)', lRoad: 'ถนน กว้างตามจริง (OpenStreetMap)', lDist: 'เส้นแบ่งเขต/อำเภอ', lLab: 'ป้ายเขตที่ทรุดเร็วที่สุด',
     cls: ['ไม่ทรุดหรือยกตัว', 'ทรุดน้อย', 'ทรุดปานกลาง', 'ทรุดสูง', 'ทรุดสูงมาก'],
     expl: [
       'พื้นตรงนี้ไม่ทรุดหรือยกตัวขึ้นเล็กน้อย ซึ่งพบน้อยมากในสามจังหวัดนี้',
@@ -376,7 +376,7 @@ const I18N = {
     yrL: n => `in ${n} yrs`, kmU: 'km', mU: 'm',
     nod: 'Not measurable, such as rice fields, fish ponds and water', stable: 'Not sinking or rising (0 or more)', faint: 'Faded colour = high uncertainty', riskLo: 'Very low', riskHi: 'Very high',
     lFlood: 'Flooding on 21 Oct 2026 from radar', lGfm: 'Same-day flooding from Copernicus GFM (comparison)',
-    more: 'More layers', lBld: '3D buildings (zoom in)', lRoad: 'Roads at real width (OpenStreetMap)', lDist: 'District boundaries', lLab: 'Labels for the fastest-sinking districts',
+    more: 'More layers', lBld: 'Buildings (flat when zoomed out, 3D when zoomed in)', lRoad: 'Roads at real width (OpenStreetMap)', lDist: 'District boundaries', lLab: 'Labels for the fastest-sinking districts',
     cls: ['Not sinking or rising', 'Low', 'Moderate', 'High', 'Very high'],
     expl: [
       'The ground here is not sinking or is rising slightly, which is very rare in these provinces.',
@@ -608,6 +608,7 @@ function applyBld() {
   if (!meta) return;
   const e = bldColor();
   meta.buildings.forEach((_, i) => map.getLayer(`ss-bld${i}`) && map.setPaintProperty(`ss-bld${i}`, 'fill-extrusion-color', e));
+  if (map.getLayer('ss-blo')) map.setPaintProperty('ss-blo', 'fill-color', e);
   renderBldLegend();
 }
 const fmt = (x, d = 1) => x.toLocaleString(lang === 'th' ? 'th-TH' : 'en-GB', { minimumFractionDigits: d, maximumFractionDigits: d });
@@ -1071,6 +1072,12 @@ map.on('load', async () => {
     map.addLayer({ id: `ss-bld${i}`, type: 'fill-extrusion', source: `ss-b${i}`, 'source-layer': 'buildings', minzoom: 13,
       paint: { 'fill-extrusion-color': colorExpr('c'), 'fill-extrusion-height': ['get', 'h'], 'fill-extrusion-opacity': .93 } });
   });
+  if (meta.bldLo) {
+    // ซูมออก (z10–13): อาคารแบบ 2 มิติ ไม่มีความสูง จาก buildings_lo.pmtiles (scripts/bld_export.py + tippecanoe)
+    map.addSource('ss-blo', { type: 'vector', url: `pmtiles://${new URL(meta.bldLo, location.href)}` });
+    map.addLayer({ id: 'ss-blo', type: 'fill', source: 'ss-blo', 'source-layer': 'buildings', minzoom: 10, maxzoom: 13,
+      paint: { 'fill-color': colorExpr('c'), 'fill-outline-color': 'rgba(60,20,20,0.35)', 'fill-opacity': ['interpolate', ['linear'], ['zoom'], 10, .75, 12.5, .95] } }, firstSymbol);
+  }
   // ป้าย 6 เขตที่ทรุดเร็วที่สุด เขียนลงบนแผนที่ตรง ๆ
   map.addLayer({ id: 'ss-lab', type: 'symbol', source: 'ss-dist', maxzoom: 12.5, filter: ['<=', ['get', 'rank'], 6],
     layout: { 'text-field': labelExpr(), 'text-font': font, 'text-size': 13, 'text-line-height': 1.25, 'text-padding': 4 },
@@ -1132,7 +1139,7 @@ map.on('load', async () => {
   const pick = (attr, set) => document.querySelectorAll(`[data-${attr}]`).forEach(b => b.onclick = () => {
     set(b.dataset[attr]); document.querySelectorAll(`[data-${attr}]`).forEach(x => x.setAttribute('aria-pressed', x === b)); showFlood(); });
   pick('yr', v => slrYear = +v); pick('ssp', v => ssp = v); pick('sub', v => subOn = v); pick('def', v => defOn = v);
-  $('l-bld').onchange = e => { vis(meta.buildings.map((_, i) => `ss-bld${i}`), e.target.checked); $('bldLeg').hidden = !e.target.checked; };
+  $('l-bld').onchange = e => { vis([...meta.buildings.map((_, i) => `ss-bld${i}`), 'ss-blo'], e.target.checked); $('bldLeg').hidden = !e.target.checked; };
   $('l-road').onchange = e => { roadsOn = e.target.checked; applyRoads(); };
   $('l-dist').onchange = e => vis(['ss-dist'], e.target.checked);
   $('l-lab').onchange = e => vis(['ss-lab'], e.target.checked);
