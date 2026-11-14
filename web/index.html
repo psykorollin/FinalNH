@@ -87,7 +87,7 @@
   .nod { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); margin-top: 6px; }
   .nod i { width: 16px; height: 10px; background: #c8c8c8; border-radius: 2px; }
 
-  #slrCtl { margin: 4px 0 6px; }
+  #slrCtl { margin: 12px 0 6px; }
   #slrCtl .seg { margin: 0 0 8px; }
   #slrCtl .seg button:disabled { opacity: .35; cursor: default; }
   .ctl-l { font-size: 12.5px; color: var(--muted); margin: 2px 0 3px; }
@@ -274,6 +274,8 @@
     <button id="m-slr" aria-pressed="false" data-i18n="mSlr" hidden>น้ำทะเล</button>
     <button id="m-risk" aria-pressed="false" data-i18n="mRisk" hidden>ความเสี่ยง</button>
   </div>
+  <p class="scale-t" id="scaleT"></p>
+  <div id="legend"></div>
   <div id="slrCtl" hidden>
     <div class="ctl-l" data-i18n="cYear">ปี</div>
     <div class="seg" role="group" aria-label="year">
@@ -297,8 +299,7 @@
       <button data-def="undef" aria-pressed="false" data-i18n="cDefN">ไม่มีคัน</button>
     </div>
   </div>
-  <p class="scale-t" id="scaleT"></p>
-  <div id="legend"></div>
+  <div id="slrSum"></div>
 
   <div class="pl-row">
     <div class="fac-leg" id="facLeg" hidden></div>
@@ -666,16 +667,21 @@ function applyBld() {
 const fmt = (x, d = 1) => x.toLocaleString(lang === 'th' ? 'th-TH' : 'en-GB', { minimumFractionDigits: d, maximumFractionDigits: d });
 
 // ---- สัญลักษณ์แบบไม้บรรทัด ----
+// คำอธิบายสีอยู่เหนือปุ่มเลือกปี ส่วนสรุปพื้นที่/ประชากรของโหมดน้ำทะเลอยู่ใต้ปุ่ม (#slrSum)
+function renderLegend() {
+  const [key, sum = ''] = legendHTML().split('<!--sum-->');
+  $('legend').innerHTML = key; $('slrSum').innerHTML = sum;
+}
 function legendHTML() {
   if (mode === 'slr' && slrYear === NOW && meta.tide) {
     const t = meta.tide, d = t.main_event;
-    return `<div class="swl"><i style="background:#2171b5"></i><span>${T('tideCls')}</span></div>
+    return `<div class="swl"><i style="background:#2171b5"></i><span>${T('tideCls')}</span></div><!--sum-->
       <p class="slr-sum">${T('tideSum')(d, t.water_level_m, Math.round(t.tidal_km2).toLocaleString(), t.population.toLocaleString(), t.buildings.toLocaleString())}</p>
       <p class="slr-sum">${T('tideNote')}</p>`;
   }
   if (mode === 'slr') {
     const r = meta.sfl.runs[runName()] || {}, alt = slrYear !== NOW && subOn === 'sub' ? meta.sfl.runs[runName('nosub')] : null;
-    return `<div class="swl">${meta.sfl.depth.map(([lo, c], i) => `<i style="background:${c}"></i><span>${T('depthL')[i]}</span>`).join('')}</div>
+    return `<div class="swl">${meta.sfl.depth.map(([lo, c], i) => `<i style="background:${c}"></i><span>${T('depthL')[i]}</span>`).join('')}</div><!--sum-->
       <p class="slr-sum">${T('flSum')((r.area || 0).toLocaleString(), (r.pop || 0).toLocaleString(), (r.bld || 0).toLocaleString(), Math.round((r.sea || 0) * 100))}</p>
       ${alt ? `<p class="slr-sum">${T('flCmp')((r.area - alt.area).toLocaleString())}</p>` : ''}
       <p class="slr-sum">${T('slrNote')}</p>`;
@@ -720,7 +726,7 @@ function applyLang() {
   $('lede').innerHTML = T('lede');
   $('lang').textContent = lang === 'th' ? 'English' : 'ภาษาไทย';
   $('scaleT').textContent = mode === 'risk' ? T('scaleRisk') : mode === 'slr' ? T('scaleSlr') : T('scaleSub');
-  $('legend').innerHTML = legendHTML();
+  renderLegend();
   renderBldLegend();
   renderPlaces();
   document.querySelectorAll('[data-yr]').forEach(b => b.innerHTML = +b.dataset.yr === NOW ? T('now') : `${T('be')(+b.dataset.yr)}<small>${T('yrL')(+b.dataset.yr - NOW)}</small>`);
@@ -754,7 +760,7 @@ function idwAt(lng, lat) {
 }
 function applyIdw() {
   if (map.getLayer('ss-idw')) map.setLayoutProperty('ss-idw', 'visibility', mode === 'sub' && idwOn ? 'visible' : 'none');
-  if (mode === 'sub') $('legend').innerHTML = legendHTML();
+  if (mode === 'sub') renderLegend();
   if (last) showCard(last);
 }
 // ---- น้ำท่วมจากทะเล (SFINCS): เลือกรอบตามปี/ฉากทัศน์/การทรุด/คันกั้นน้ำ ----
@@ -768,7 +774,7 @@ async function showFlood() {
   map.setLayoutProperty('ss-slr', 'visibility', mode === 'slr' && !isNow ? 'visible' : 'none');
   if (isNow) {
     if (!tideGrid && meta.tide) tideGrid = new Uint8Array(await fetch('tide.bin').then(r => r.arrayBuffer()));
-    if (mode === 'slr') $('legend').innerHTML = legendHTML();
+    if (mode === 'slr') renderLegend();
     if (last) showCard(last);
     return;
   }
@@ -776,7 +782,7 @@ async function showFlood() {
   if (!meta.sfl.runs[n]) return;
   map.getSource('ss-slr').updateImage({ url: `fl_${n}.png`, coordinates: meta.sfl.image });
   if (flName !== n) { flName = n; flGrid = null; flGrid = new Uint8Array(await fetch(`fl_${n}.bin`).then(r => r.arrayBuffer())); }
-  if (mode === 'slr') $('legend').innerHTML = legendHTML();
+  if (mode === 'slr') renderLegend();
   if (last) showCard(last);
 }
 function tideAt(lng, lat) {
@@ -1099,7 +1105,7 @@ function setMode(m) {
   $('slrCtl').hidden = m !== 'slr';
   if (m === 'slr') showFlood();
   $('scaleT').textContent = m === 'risk' ? T('scaleRisk') : m === 'slr' ? T('scaleSlr') : T('scaleSub');
-  $('legend').innerHTML = legendHTML();
+  renderLegend();
   applyBld();
   if (last) showCard(last);
 }
