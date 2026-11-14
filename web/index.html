@@ -706,6 +706,9 @@ function fitPts(pts) {
   const xs = pts.map(c => c[0]), ys = pts.map(c => c[1]), small = matchMedia('(max-width: 700px)').matches;
   const pad = small ? { top: 70, bottom: Math.round(innerHeight * 0.62), left: 30, right: 70 }
     : { top: 50, bottom: 50, left: 380, right: Math.max(80, Math.min(460, innerWidth - 380 - 260)) };
+  // จอเตี้ยหรือแคบ: ลดขอบล่าง/ซ้ายให้เหลือพื้นที่แผนที่อย่างน้อย 160×200 พิกเซล
+  pad.bottom = Math.max(10, Math.min(pad.bottom, innerHeight - pad.top - 160));
+  pad.left = Math.max(10, Math.min(pad.left, innerWidth - pad.right - 200));
   map.fitBounds([[Math.min(...xs), Math.min(...ys)], [Math.max(...xs), Math.max(...ys)]], { padding: pad, maxZoom: 14 });
 }
 function renderTrLeg() {
