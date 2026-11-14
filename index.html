@@ -109,7 +109,7 @@
 
   /* ---- การ์ดเมื่อคลิก ---- */
   /* แถบสีอาคาร มุมขวาล่าง */
-  #bldLeg { right: 66px; bottom: 36px; width: min(440px, calc(100% - 434px)); padding: 6px 10px 5px; z-index: 1; }
+  #bldLeg { right: 66px; bottom: 12px; width: min(440px, calc(100% - 434px)); padding: 6px 10px 5px; z-index: 1; }
   #bldLeg:empty, body:has(#card.open) #bldLeg { display: none; }
   #bldLeg h2 { font: 600 12px/1.3 var(--head); margin: 0 0 4px; }
   #bldLeg .bl-bar { display: grid; grid-template-columns: repeat(5, 1fr) 0.9fr; column-gap: 2px; }
@@ -227,6 +227,8 @@
   .lr .bm-pop { right: calc(100% + 10px); top: auto; bottom: -2px; }
   @media (max-width: 700px) { .lr-list { max-height: calc(100dvh - 380px); } }
   .lr-hint { font-size: 12.5px; color: var(--muted); margin: 10px 0 0; }
+  .credits { font-size: 11px; line-height: 1.45; color: var(--muted); margin: 10px 0 0; padding-top: 8px; border-top: 1px solid var(--rule); }
+  .credits a { color: inherit; text-underline-offset: 2px; }
   .fac-leg b { flex-basis: 100%; font-weight: 600; color: var(--ink); }
 </style>
 </head>
@@ -303,6 +305,7 @@
     <details id="evBox"><summary data-i18n="evList">ลำดับเหตุการณ์</summary><ul id="evList"></ul></details>
   </div>
   <p class="lr-hint" data-i18n="railHint">เปิด/ปิดอาคาร สถานที่ ถนน และเส้นแบ่งเขตได้ที่แถบ "ชั้นข้อมูล" ทางขวาของแผนที่</p>
+  <p class="credits" id="credits"></p>
 </aside>
 
 <section id="card" class="panel" aria-live="polite">
@@ -924,14 +927,21 @@ const protocol = new pmtiles.Protocol();
 maplibregl.addProtocol('pmtiles', protocol.tile);
 const map = new maplibregl.Map({
   container: 'map', style: 'https://tiles.openfreemap.org/styles/positron',
-  center: [100.55, 13.68], zoom: 9.8, pitch: 0, maxPitch: 70, hash: true, attributionControl: { compact: true },
+  center: [100.55, 13.68], zoom: 9.8, pitch: 0, maxPitch: 70, hash: true, attributionControl: false,
 });
 map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), 'top-right');
 map.addControl(new maplibregl.GeolocateControl({ positionOptions: { enableHighAccuracy: true }, trackUserLocation: false }), 'top-right');
 map.addControl(new maplibregl.ScaleControl(), 'bottom-left');
-// เครดิตแผนที่ (OSM/OpenFreeMap/Esri ต้องแสดงตามเงื่อนไขการใช้) พับไว้เหลือปุ่ม ⓘ ตั้งแต่เปิดหน้า กดแล้วจึงกางออก
-const foldAttrib = () => { const a = document.querySelector('.maplibregl-ctrl-attrib'); if (a) { a.classList.remove('maplibregl-compact-show'); a.removeAttribute('open'); } };
-map.once('load', foldAttrib); map.once('idle', foldAttrib);
+// เครดิตแผนที่ (OSM/OpenFreeMap/Esri ต้องแสดงตามเงื่อนไขการใช้) อยู่ท้ายแผงซ้ายแทนมุมแผนที่
+// รวมจาก source ที่มีชั้นเปิดอยู่ เหมือนที่ AttributionControl ทำ เปลี่ยนตามแผนที่ฐานที่เลือก
+function updateCredits() {
+  const st = map.getStyle(); if (!st) return;
+  const seen = new Set();
+  st.layers.forEach(l => { if (l.source && l.layout?.visibility !== 'none') { const a = map.getSource(l.source)?.attribution; if (a) seen.add(a); } });
+  const html = [...seen].join(' | ');
+  if ($('credits').innerHTML !== html) $('credits').innerHTML = html;
+}
+map.on('idle', updateCredits);
 
 // ---- แผนที่ฐาน ----
 // "light" คือสไตล์เวกเตอร์ OpenFreeMap เดิม, "liberty" เป็นสไตล์เวกเตอร์ที่ใช้ข้อมูล OSM ชุดเดียวกัน (โหลดเมื่อเลือก)
