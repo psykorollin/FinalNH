@@ -929,6 +929,9 @@ const map = new maplibregl.Map({
 map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), 'top-right');
 map.addControl(new maplibregl.GeolocateControl({ positionOptions: { enableHighAccuracy: true }, trackUserLocation: false }), 'top-right');
 map.addControl(new maplibregl.ScaleControl(), 'bottom-left');
+// เครดิตแผนที่ (OSM/OpenFreeMap/Esri ต้องแสดงตามเงื่อนไขการใช้) พับไว้เหลือปุ่ม ⓘ ตั้งแต่เปิดหน้า กดแล้วจึงกางออก
+const foldAttrib = () => { const a = document.querySelector('.maplibregl-ctrl-attrib'); if (a) { a.classList.remove('maplibregl-compact-show'); a.removeAttribute('open'); } };
+map.once('load', foldAttrib); map.once('idle', foldAttrib);
 
 // ---- แผนที่ฐาน ----
 // "light" คือสไตล์เวกเตอร์ OpenFreeMap เดิม, "liberty" เป็นสไตล์เวกเตอร์ที่ใช้ข้อมูล OSM ชุดเดียวกัน (โหลดเมื่อเลือก)
