@@ -109,7 +109,7 @@
 
   /* ---- การ์ดเมื่อคลิก ---- */
   /* แถบสีอาคาร มุมขวาล่าง */
-  #bldLeg { right: 12px; bottom: 36px; width: min(440px, calc(100% - 380px)); padding: 6px 10px 5px; z-index: 3; }
+  #bldLeg { right: 96px; bottom: 36px; width: min(440px, calc(100% - 464px)); padding: 6px 10px 5px; z-index: 1; }
   #bldLeg:empty, body:has(#card.open) #bldLeg { display: none; }
   #bldLeg h2 { font: 600 12px/1.3 var(--head); margin: 0 0 4px; }
   #bldLeg .bl-bar { display: grid; grid-template-columns: repeat(5, 1fr) 0.9fr; column-gap: 2px; }
@@ -174,7 +174,7 @@
   /* สถานที่และเหตุการณ์สำคัญ */
   .pl-row { margin-top: 14px; padding-top: 8px; border-top: 1px solid var(--rule); }
   .pl-sw { width: 12px; height: 12px; border-radius: 50%; flex: none; border: 2px solid var(--paper); box-shadow: 0 0 0 1px var(--muted); }
-  .fac-leg { display: flex; flex-wrap: wrap; gap: 3px 10px; font-size: 12.5px; color: var(--muted); margin: -3px 0 6px 26px; }
+  .fac-leg { display: flex; flex-wrap: wrap; gap: 3px 10px; font-size: 12.5px; color: var(--muted); margin: 2px 0 8px; }
   .fac-leg span { display: inline-flex; align-items: center; gap: 5px; }
   .fac-leg i { width: 9px; height: 9px; border-radius: 50%; }
   #evList { list-style: none; padding: 0; margin: 2px 0 0; }
@@ -194,20 +194,63 @@
   .bm-ctl > button.bm-btn svg { width: 18px; height: 18px; display: block; margin: auto; color: #333; }
   .bm-pop { position: absolute; right: 38px; top: 0; width: 214px; background: var(--paper); color: var(--ink);
     border: 1px solid var(--rule); border-radius: 8px; box-shadow: var(--shadow); padding: 8px; font-family: var(--body); display: none; }
-  .bm-ctl.open .bm-pop { display: block; max-height: calc(100vh - 150px); overflow-y: auto; }
+  .bm-ctl.open .bm-pop { display: block; max-height: calc(100vh - 90px); overflow-y: auto; }
   .bm-pop h3 { font: 600 13px var(--head); margin: 2px 4px 6px; letter-spacing: .02em; }
-  .maplibregl-ctrl-group .bm-pop button.bm-opt { display: flex; align-items: center; gap: 9px; width: 100%; height: auto;
+  .bm-pop button.bm-opt { display: flex; align-items: center; gap: 9px; width: 100%; height: auto;
     padding: 5px 6px; border: 0; background: none; color: inherit; font: 14px var(--body); text-align: left; cursor: pointer; border-radius: 6px; }
-  .maplibregl-ctrl-group .bm-pop button.bm-opt:hover { background: var(--wash); }
-  .maplibregl-ctrl-group .bm-pop button.bm-opt[aria-pressed="true"] { background: var(--wash); font-weight: 600; }
+  .bm-pop button.bm-opt:hover { background: var(--wash); }
+  .bm-pop button.bm-opt[aria-pressed="true"] { background: var(--wash); font-weight: 600; }
   .bm-opt img { width: 42px; height: 42px; border-radius: 5px; object-fit: cover; border: 1px solid var(--rule); flex: none; background: var(--wash); }
   .bm-note { font-size: 12px; line-height: 1.45; color: var(--muted); margin: 6px 4px 2px; }
   .bm-opt[aria-pressed="true"] img { outline: 2px solid var(--staff); outline-offset: 1px; }
+
+  /* ---- แถบชั้นข้อมูลด้านขวา (ปุ่มกลมเปิด/ปิด ใต้ปุ่มซูม) ---- */
+  .lr { background: var(--paper); color: var(--ink); border: 1px solid var(--rule); border-radius: 12px; box-shadow: var(--shadow);
+    width: 72px; padding: 3px; font-family: var(--body); }
+  .lr-head { display: grid; justify-items: center; gap: 2px; width: 100%; border: 0; background: none; color: var(--ink); cursor: pointer;
+    padding: 4px 2px; border-radius: 9px; font: 600 11px/1.2 var(--head); }
+  .lr-head svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linejoin: round; }
+  .lr-head[aria-expanded="true"] { border-bottom: 1px solid var(--rule); border-radius: 9px 9px 0 0; margin-bottom: 2px; }
+  .lr-list { max-height: calc(100dvh - 270px); min-height: 120px; overflow-y: auto; scrollbar-width: thin; }
+  .lr-foot { border-top: 1px solid var(--rule); margin-top: 2px; padding-top: 2px; }
+  .lr .rl { position: relative; display: grid; justify-items: center; gap: 2px; width: 100%; padding: 3px 1px; border: 0; background: none;
+    border-radius: 8px; cursor: pointer; color: inherit; font: inherit; }
+  .lr .rl:hover { background: var(--wash); }
+  .lr .rl input { position: absolute; top: 6px; left: 50%; width: 1px; height: 1px; margin: 0; opacity: 0; pointer-events: none; }
+  .lr .ri { display: grid; place-items: center; width: 29px; height: 29px; border-radius: 50%; background: var(--wash); color: var(--muted);
+    border: 1.5px solid var(--rule); transition: background .15s, color .15s, border-color .15s; }
+  .lr .ri svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .lr .rl input:checked + .ri, .bm-ctl.open .ri { background: var(--c); border-color: var(--c); color: #fff; }
+  .lr .rl input:focus-visible + .ri { outline: 2px solid var(--staff); outline-offset: 2px; }
+  .lr .rt { font-size: 10.5px; line-height: 1.15; text-align: center; color: var(--muted); max-width: 64px; overflow-wrap: anywhere; }
+  .lr .rl input:checked ~ .rt { color: var(--ink); font-weight: 500; }
+  .lr .bm-pop { right: calc(100% + 12px); top: auto; bottom: -4px; }
+  .lr-hint { font-size: 12.5px; color: var(--muted); margin: 10px 0 0; }
+  .fac-leg b { flex-basis: 100%; font-weight: 600; color: var(--ink); }
+  @media (max-width: 700px) { .lr { width: 64px; } .lr-list { max-height: calc(100dvh - 330px); } }
 </style>
 </head>
 <body>
 <div id="map" role="application" aria-label="map"></div>
 <section id="bldLeg" class="panel" aria-labelledby="bldLegT"></section>
+<nav id="lyrRail" class="lr maplibregl-ctrl" aria-label="layers">
+  <button id="lrHead" class="lr-head" type="button" aria-expanded="true" aria-controls="lrBody"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2 8.5 12 14l10-5.5L12 3Z"/><path d="m2 13 10 5.5L22 13"/><path d="m2 17.5 10 5.5 10-5.5" opacity=".55"/></svg><span data-i18n="rail">ชั้นข้อมูล</span></button>
+  <div id="lrBody" class="lr-body">
+    <div class="lr-list">
+      <label class="rl" style="--c:#b5532a" data-i18n-title="lBld"><input type="checkbox" id="l-bld" checked><span class="ri"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 21V5l8-3v19M12 8l8 3v10M2 21h20M7 9h2M7 13h2M7 17h2M15 14h2M15 18h2"/></svg></span><span class="rt" data-i18n="rBld">อาคาร</span></label>
+      <label class="rl" style="--c:#7a4f2e" data-i18n-title="lB3d"><input type="checkbox" id="l-b3d" checked><span class="ri"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 3 7v10l9 5 9-5V7l-9-5Z"/><path d="m3 7 9 5 9-5M12 12v10"/></svg></span><span class="rt" data-i18n="rB3d">3 มิติ</span></label>
+      <label class="rl" style="--c:#1b2629" data-i18n-title="lLm"><input type="checkbox" id="l-lm" checked><span class="ri"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9L12 3Z"/></svg></span><span class="rt" data-i18n="rLm">จุดสำคัญ</span></label>
+      <label class="rl" style="--c:#3b7dd8" data-i18n-title="lFac"><input type="checkbox" id="l-fac"><span class="ri"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 9l10-5 10 5-10 5L2 9Z"/><path d="M6 11v5c3 2.5 9 2.5 12 0v-5M22 9v6"/></svg></span><span class="rt" data-i18n="rFac">โรงเรียน ฯลฯ</span></label>
+      <label class="rl" style="--c:#c41e24" data-i18n-title="lEv"><input type="checkbox" id="l-ev" checked><span class="ri"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 21V4M5 4h11l-2 4 2 4H5"/></svg></span><span class="rt" data-i18n="rEv">เหตุการณ์</span></label>
+      <label class="rl" style="--c:#6a51a3" data-i18n-title="lDist"><input type="checkbox" id="l-dist" checked><span class="ri"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6l6-3 5 3 5-1v13l-6 3-5-3-5 2V6Z" stroke-dasharray="3 2.5"/></svg></span><span class="rt" data-i18n="rDist">เขต/อำเภอ</span></label>
+      <label class="rl" style="--c:#707a80" data-i18n-title="lRoad"><input type="checkbox" id="l-road" checked><span class="ri"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3 4 21M16 3l4 18M12 5v3M12 11v3M12 17v3"/></svg></span><span class="rt" data-i18n="rRoad">ถนน</span></label>
+      <label class="rl" style="--c:#2a7f62" data-i18n-title="lLab"><input type="checkbox" id="l-lab" checked><span class="ri"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12V4h8l10 10-8 8L3 12Z"/><circle cx="7.5" cy="8" r="1.5"/></svg></span><span class="rt" data-i18n="rLab">ป้ายเขต</span></label>
+      <label class="rl" id="floodRow" hidden style="--c:var(--flood)" data-i18n-title="lFlood"><input type="checkbox" id="l-flood"><span class="ri"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11Z"/></svg></span><span class="rt" data-i18n="rFlood">น้ำท่วม</span></label>
+      <label class="rl" id="gfmRow" hidden style="--c:var(--gfm)" data-i18n-title="lGfm"><input type="checkbox" id="l-gfm"><span class="ri"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 15c2-1 4 1 6 0s4-1 6 0 4 1 6 0M3 19c2-1 4 1 6 0s4-1 6 0 4 1 6 0"/><path d="M12 3s3 3.5 3 6a3 3 0 0 1-6 0c0-2.5 3-6 3-6Z"/></svg></span><span class="rt" data-i18n="rGfm">GFM</span></label>
+    </div>
+    <div class="lr-foot" id="bmSlot"></div>
+  </div>
+</nav>
 <button id="toggle" class="panel" data-i18n="menu">ค้นหาและชั้นข้อมูล</button>
 
 <aside id="side" class="panel">
@@ -255,24 +298,11 @@
   <p class="scale-t" id="scaleT"></p>
   <div id="legend"></div>
 
-  <div class="flood-row" id="floodRow" hidden>
-    <label class="chk"><input type="checkbox" id="l-flood"> <span class="sw" style="background:var(--flood)"></span> <span data-i18n="lFlood">น้ำท่วม</span></label>
-  </div>
   <div class="pl-row">
-    <label class="chk"><input type="checkbox" id="l-lm" checked> <span class="pl-sw" style="background:#1b2629"></span> <span data-i18n="lLm">สถานที่สำคัญ</span></label>
-    <label class="chk"><input type="checkbox" id="l-fac"> <span class="pl-sw" style="background:#3b7dd8"></span> <span data-i18n="lFac">โรงเรียน โรงพยาบาล สถานีตำรวจ/ดับเพลิง สถานีรถไฟ</span></label>
     <div class="fac-leg" id="facLeg" hidden></div>
-    <label class="chk"><input type="checkbox" id="l-ev" checked> <span class="pl-sw" style="background:#c41e24"></span> <span data-i18n="lEv">เหตุการณ์สำคัญ</span></label>
     <details id="evBox"><summary data-i18n="evList">ลำดับเหตุการณ์</summary><ul id="evList"></ul></details>
   </div>
-  <details>
-    <summary data-i18n="more">ชั้นข้อมูลอื่น</summary>
-    <label class="chk" id="gfmRow" hidden><input type="checkbox" id="l-gfm"> <span class="sw" style="background:var(--gfm)"></span> <span data-i18n="lGfm">GFM</span></label>
-    <label class="chk"><input type="checkbox" id="l-bld" checked> <span data-i18n="lBld">อาคาร (ซูมออกเป็น 2 มิติ ซูมเข้าเป็น 3 มิติ)</span></label>
-    <label class="chk"><input type="checkbox" id="l-road" checked> <span class="sw" style="background:#cdd1d4"></span> <span data-i18n="lRoad">ถนน</span></label>
-    <label class="chk"><input type="checkbox" id="l-dist" checked> <span data-i18n="lDist">ขอบเขต</span></label>
-    <label class="chk"><input type="checkbox" id="l-lab" checked> <span data-i18n="lLab">ป้ายจุดที่ทรุดมาก</span></label>
-  </details>
+  <p class="lr-hint" data-i18n="railHint">เปิด/ปิดอาคาร สถานที่ ถนน และเส้นแบ่งเขตได้ที่แถบ "ชั้นข้อมูล" ทางขวาของแผนที่</p>
 </aside>
 
 <section id="card" class="panel" aria-live="polite">
@@ -320,6 +350,9 @@ const I18N = {
     yrL: n => `อีก ${n} ปี`, kmU: 'กม.', mU: 'ม.',
     nod: 'วัดไม่ได้ เช่น นาข้าว บ่อปลา แหล่งน้ำ', stable: 'ไม่ทรุดหรือยกตัว (0 ขึ้นไป)', faint: 'สีจาง = ค่าไม่แน่นอนสูง', riskLo: 'ต่ำมาก', riskHi: 'สูงมาก',
     lFlood: 'น้ำท่วม 21 ต.ค. 2569 จากภาพเรดาร์', lGfm: 'น้ำท่วมวันเดียวกันจาก Copernicus GFM (ใช้เทียบ)',
+    rail: 'ชั้นข้อมูล', railHint: 'เปิด/ปิดอาคาร สถานที่ ถนน และเส้นแบ่งเขตได้ที่แถบ "ชั้นข้อมูล" ทางขวาของแผนที่', bmShort: 'แผนที่ฐาน',
+    rBld: 'อาคาร', rB3d: '3 มิติ', rLm: 'จุดสำคัญ', rFac: 'โรงเรียน ฯลฯ', rEv: 'เหตุการณ์', rDist: 'เขต/อำเภอ', rRoad: 'ถนน', rLab: 'ป้ายเขต', rFlood: 'น้ำท่วม', rGfm: 'GFM',
+    lB3d: 'อาคาร 3 มิติเมื่อซูมเข้า (ปิดเพื่อดูอาคารแบบ 2 มิติทุกระดับซูม)',
     more: 'ชั้นข้อมูลอื่น', lBld: 'อาคาร (ซูมออกเป็น 2 มิติ ซูมเข้าเป็น 3 มิติ)', lRoad: 'ถนน กว้างตามจริง (OpenStreetMap)', lDist: 'เส้นแบ่งเขต/อำเภอ', lLab: 'ป้ายเขตที่ทรุดเร็วที่สุด',
     cls: ['ไม่ทรุดหรือยกตัว', 'ทรุดน้อย', 'ทรุดปานกลาง', 'ทรุดสูง', 'ทรุดสูงมาก'],
     expl: [
@@ -376,6 +409,9 @@ const I18N = {
     yrL: n => `in ${n} yrs`, kmU: 'km', mU: 'm',
     nod: 'Not measurable, such as rice fields, fish ponds and water', stable: 'Not sinking or rising (0 or more)', faint: 'Faded colour = high uncertainty', riskLo: 'Very low', riskHi: 'Very high',
     lFlood: 'Flooding on 21 Oct 2026 from radar', lGfm: 'Same-day flooding from Copernicus GFM (comparison)',
+    rail: 'Layers', railHint: 'Turn buildings, places, roads and boundaries on or off in the "Layers" bar on the right of the map', bmShort: 'Basemap',
+    rBld: 'Buildings', rB3d: '3D', rLm: 'Key places', rFac: 'Schools etc.', rEv: 'Events', rDist: 'Districts', rRoad: 'Roads', rLab: 'Labels', rFlood: 'Flooding', rGfm: 'GFM',
+    lB3d: '3D buildings when zoomed in (off: flat buildings at every zoom)',
     more: 'More layers', lBld: 'Buildings (flat when zoomed out, 3D when zoomed in)', lRoad: 'Roads at real width (OpenStreetMap)', lDist: 'District boundaries', lLab: 'Labels for the fastest-sinking districts',
     cls: ['Not sinking or rising', 'Low', 'Moderate', 'High', 'Very high'],
     expl: [
@@ -572,7 +608,7 @@ function placeHTML(p) {
     ${p.b ? `<dt>${T('facB')}</dt><dd>${T('bcls')[p.b] || p.b}</dd>` : ''}</dl></div>`;
 }
 function renderPlaces() {
-  $('facLeg').innerHTML = Object.entries(FAC_COLORS).map(([k, c]) => `<span><i style="background:${c}"></i>${T('facT')[k]}</span>`).join('');
+  $('facLeg').innerHTML = `<b>${T('lFac')}</b>` + Object.entries(FAC_COLORS).map(([k, c]) => `<span><i style="background:${c}"></i>${T('facT')[k]}</span>`).join('');
   $('evList').innerHTML = EVENTS.map((e, i) => e.ll
     ? `<li><button type="button" data-ev="${i}"><span class="ev-y">${e.date[lang]}</span><span>${e.t[lang]}</span></button></li>`
     : `<li><div class="ev-nl"><span class="ev-y">${e.date[lang]}</span><span>${e.t[lang]}<small>${e.d[lang]}</small></span></div></li>`).join('');
@@ -609,6 +645,7 @@ function applyBld() {
   const e = bldColor();
   meta.buildings.forEach((_, i) => map.getLayer(`ss-bld${i}`) && map.setPaintProperty(`ss-bld${i}`, 'fill-extrusion-color', e));
   if (map.getLayer('ss-blo')) map.setPaintProperty('ss-blo', 'fill-color', e);
+  meta.buildings.forEach((_, i) => map.getLayer(`ss-bldf${i}`) && map.setPaintProperty(`ss-bldf${i}`, 'fill-color', e));
   renderBldLegend();
 }
 const fmt = (x, d = 1) => x.toLocaleString(lang === 'th' ? 'th-TH' : 'en-GB', { minimumFractionDigits: d, maximumFractionDigits: d });
@@ -658,6 +695,7 @@ function applyLang() {
   document.documentElement.lang = lang;
   document.querySelectorAll('[data-i18n]').forEach(e => e.textContent = T(e.dataset.i18n));
   document.querySelectorAll('[data-i18n-ph]').forEach(e => e.placeholder = T(e.dataset.i18nPh));
+  document.querySelectorAll('[data-i18n-title]').forEach(e => e.title = T(e.dataset.i18nTitle));
   $('lede').innerHTML = T('lede');
   $('lang').textContent = lang === 'th' ? 'English' : 'ภาษาไทย';
   $('scaleT').textContent = mode === 'risk' ? T('scaleRisk') : mode === 'slr' ? T('scaleSlr') : T('scaleSub');
@@ -918,10 +956,10 @@ const BASEMAPS = {
 };
 let basemap = 'light', baseLayers = null;
 const bmCtl = document.createElement('div');
-bmCtl.className = 'maplibregl-ctrl maplibregl-ctrl-group bm-ctl';
+bmCtl.className = 'bm-ctl';
 function renderBm() {
-  bmCtl.innerHTML = `<button class="bm-btn" type="button" aria-haspopup="true" aria-expanded="${bmCtl.classList.contains('open')}" title="${T('bmTitle')}" aria-label="${T('bmTitle')}">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3 2 8.5 12 14l10-5.5L12 3Z"/><path d="m2 13 10 5.5L22 13"/><path d="m2 17.5 10 5.5 10-5.5" opacity=".55"/></svg></button>
+  bmCtl.innerHTML = `<button class="bm-btn rl" type="button" style="--c:#56666b" aria-haspopup="true" aria-expanded="${bmCtl.classList.contains('open')}" title="${T('bmTitle')}">
+    <span class="ri"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2Z"/><path d="M9 4v14M15 6v14"/></svg></span><span class="rt">${T('bmShort')}</span></button>
     <div class="bm-pop" role="menu"><h3>${T('bmTitle')}</h3>${Object.keys(BASEMAPS).map(k =>
       `<button class="bm-opt" type="button" role="menuitemradio" data-bm="${k}" aria-pressed="${k === basemap}"><img src="${BASEMAPS[k].thumb}" alt="" loading="lazy">${T('bmNames')[k]}${BASEMAPS[k].note ? ' *' : ''}</button>`).join('')}<p class="bm-note">${T('bmNote')}</p></div>`;
   bmCtl.querySelector('.bm-btn').onclick = e => { e.stopPropagation(); bmCtl.classList.toggle('open'); renderBm(); };
@@ -984,7 +1022,16 @@ async function setBasemap(id) {
   });
   applyRoads();
 }
-map.addControl({ onAdd: () => bmCtl, onRemove: () => bmCtl.remove() }, 'top-right');
+// แถบชั้นข้อมูลอยู่ใต้ปุ่มซูม/ตำแหน่ง ปุ่มแผนที่ฐานอยู่ท้ายแถบ บนจอเล็กเริ่มแบบพับไว้
+map.addControl({ onAdd: () => $('lyrRail'), onRemove: () => $('lyrRail').remove() }, 'top-right');
+$('bmSlot').append(bmCtl);
+const small = () => matchMedia('(max-width: 700px)').matches;
+function railOpen(open) {
+  $('lrHead').setAttribute('aria-expanded', open); $('lrBody').hidden = !open;
+  if (open && small()) $('side').classList.add('hidden');
+}
+railOpen(!small());
+$('lrHead').onclick = () => railOpen($('lrBody').hidden);
 document.addEventListener('click', e => { if (!bmCtl.contains(e.target) && bmCtl.classList.contains('open')) { bmCtl.classList.remove('open'); renderBm(); } });
 try { basemap = localStorage.getItem('basemap') || 'light'; } catch (err) { /* ใช้ค่าเริ่มต้น */ }
 renderBm();
@@ -1071,6 +1118,8 @@ map.on('load', async () => {
     map.addSource(`ss-b${i}`, { type: 'vector', url: `pmtiles://${new URL(f, location.href)}` });
     map.addLayer({ id: `ss-bld${i}`, type: 'fill-extrusion', source: `ss-b${i}`, 'source-layer': 'buildings', minzoom: 13,
       paint: { 'fill-extrusion-color': colorExpr('c'), 'fill-extrusion-height': ['get', 'h'], 'fill-extrusion-opacity': .93 } });
+    map.addLayer({ id: `ss-bldf${i}`, type: 'fill', source: `ss-b${i}`, 'source-layer': 'buildings', minzoom: 13, layout: { visibility: 'none' },
+      paint: { 'fill-color': colorExpr('c'), 'fill-outline-color': 'rgba(60,20,20,0.35)', 'fill-opacity': .95 } }, firstSymbol);
   });
   if (meta.bldLo) {
     // ซูมออก (z10–13): อาคารแบบ 2 มิติ ไม่มีความสูง จาก buildings_lo.pmtiles (scripts/bld_export.py + tippecanoe)
@@ -1115,7 +1164,7 @@ map.on('load', async () => {
       return;
     }
     const { lng, lat } = e.lngLat;
-    const layers = meta.buildings.map((_, i) => `ss-bld${i}`).filter(l => map.getLayoutProperty(l, 'visibility') !== 'none');
+    const layers = meta.buildings.flatMap((_, i) => [`ss-bld${i}`, `ss-bldf${i}`]).filter(l => map.getLayer(l) && map.getLayoutProperty(l, 'visibility') !== 'none');
     const f = map.queryRenderedFeatures(e.point, { layers })[0];
     const district = districtAt(lng, lat), lnglat = [lng, lat];
     $('results').hidden = true;
@@ -1128,7 +1177,7 @@ map.on('load', async () => {
     placeMarker(lng, lat);
   });
   map.on('mousemove', e => {
-    const layers = [...meta.buildings.map((_, i) => `ss-bld${i}`), ...['pl-ev', 'pl-lm', 'pl-fac'].filter(l => map.getLayer(l))];
+    const layers = [...meta.buildings.flatMap((_, i) => [`ss-bld${i}`, `ss-bldf${i}`]), ...['pl-ev', 'pl-lm', 'pl-fac']].filter(l => map.getLayer(l));
     map.getCanvas().style.cursor = map.queryRenderedFeatures(e.point, { layers }).length ? 'pointer' : '';
   });
 
@@ -1139,7 +1188,15 @@ map.on('load', async () => {
   const pick = (attr, set) => document.querySelectorAll(`[data-${attr}]`).forEach(b => b.onclick = () => {
     set(b.dataset[attr]); document.querySelectorAll(`[data-${attr}]`).forEach(x => x.setAttribute('aria-pressed', x === b)); showFlood(); });
   pick('yr', v => slrYear = +v); pick('ssp', v => ssp = v); pick('sub', v => subOn = v); pick('def', v => defOn = v);
-  $('l-bld').onchange = e => { vis([...meta.buildings.map((_, i) => `ss-bld${i}`), 'ss-blo'], e.target.checked); $('bldLeg').hidden = !e.target.checked; };
+  const bldVis = () => {
+    const on = $('l-bld').checked, d3 = $('l-b3d').checked;
+    vis(['ss-blo'], on);
+    vis(meta.buildings.map((_, i) => `ss-bld${i}`), on && d3);
+    vis(meta.buildings.map((_, i) => `ss-bldf${i}`), on && !d3);
+    $('bldLeg').hidden = !on;
+    if (on && !d3 && map.getPitch() > 0) map.easeTo({ pitch: 0, duration: 600 });
+  };
+  $('l-bld').onchange = bldVis; $('l-b3d').onchange = bldVis;
   $('l-road').onchange = e => { roadsOn = e.target.checked; applyRoads(); };
   $('l-dist').onchange = e => vis(['ss-dist'], e.target.checked);
   $('l-lab').onchange = e => vis(['ss-lab'], e.target.checked);
@@ -1151,12 +1208,12 @@ map.on('load', async () => {
   $('legend').addEventListener('change', e => { if (e.target.id === 'l-idw') { idwOn = e.target.checked; applyIdw(); } });
 });
 
-map.on('zoomend', () => { if (map.getZoom() >= 13 && map.getPitch() < 20) map.easeTo({ pitch: 50, duration: 600 }); });
+map.on('zoomend', () => { if (map.getZoom() >= 13 && map.getPitch() < 20 && $('l-bld').checked && $('l-b3d').checked) map.easeTo({ pitch: 50, duration: 600 }); });
 $('lang').onclick = () => { lang = lang === 'th' ? 'en' : 'th'; applyLang(); renderBm(); };
 $('aboutBtn').onclick = () => $('about').classList.add('open');
 $('about').onclick = e => { if (e.target.id === 'about') $('about').classList.remove('open'); };
 $('cardClose').onclick = () => { $('card').classList.remove('open'); last = null; marker?.remove(); };
-$('toggle').onclick = () => $('side').classList.toggle('hidden');
+$('toggle').onclick = () => { $('side').classList.toggle('hidden'); if (small() && !$('side').classList.contains('hidden')) railOpen(false); };
 document.addEventListener('keydown', e => { if (e.key === 'Escape') { $('about').classList.remove('open'); $('card').classList.remove('open'); $('results').hidden = true; } });
 </script>
 </body>
