@@ -12,6 +12,7 @@
 <meta property="og:url" content="https://psykorollin.github.io/FinalNH/">
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M16 2C10 2 5.5 6.6 5.5 12.4 5.5 20 16 30 16 30s10.5-10 10.5-17.6C26.5 6.6 22 2 16 2z' fill='%23c41e24'/%3E%3Ccircle cx='16' cy='12.5' r='4.2' fill='%23fff'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
 <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
 <script src="https://unpkg.com/pmtiles@3.2.1/dist/pmtiles.js"></script>
@@ -162,7 +163,7 @@
   .maplibregl-ctrl-group { border-radius: 6px; }
 
   @media (max-width: 700px) {
-    #side { width: auto; right: 12px; top: 58px; max-height: 62%; }
+    #side { width: auto; right: 66px; top: 58px; max-height: 62%; } /* เว้นคอลัมน์ปุ่มขวา (ซูม/ชั้นข้อมูล) */
     #side.hidden { display: none; }
     #toggle { display: block; }
     h1 { font-size: 21px; }
@@ -272,7 +273,6 @@
 <button id="toggle" class="panel" data-i18n="menu">ค้นหาและชั้นข้อมูล</button>
 
 <aside id="side" class="panel">
-  <script>if (matchMedia('(max-width: 700px)').matches) document.currentScript.parentElement.classList.add('hidden');</script>
   <div class="topline">
     <span class="links"><button class="link" id="aboutBtn" data-i18n="about">วิธีวัดและข้อจำกัด</button><button class="link" id="lang">English</button></span>
   </div>
@@ -495,6 +495,8 @@ const SOURCES = {
     <li>ขอบเขตปกครอง: HDX COD-AB (OCHA)</li>
     <li>ความสูงพื้นดิน: DeltaDTM v1.1 (Pronk et al. 2024), ผิวน้ำทะเลเฉลี่ย DTU21 MSS, ระดับน้ำทะเลในอนาคต IPCC AR6 (Fox-Kemper et al. 2021; Garner et al. 2021), ระดับน้ำจาก GTSM (Copernicus Climate Change Service), แบบจำลองน้ำท่วม SFINCS (Leijnse et al. 2021, Deltares)</li>
     <li>น้ำท่วมเทียบ: Copernicus Global Flood Monitoring (GFM, CEMS)</li>
+    <li>เหตุการณ์ดินทรุด หลุมยุบ และความเสียหายจากแผ่นดินไหว: รวบรวมจากข่าว 2564–2569 (ลิงก์ข่าวอยู่ในการ์ดของแต่ละจุด)</li>
+    <li>เรื่องแจ้งจากประชาชน: Traffy Fondue (public API) ใช้เฉพาะประเภท วันที่ และจำนวนเรื่อง</li>
     <li>แผนที่ฐาน: OpenFreeMap © OpenMapTiles © OpenStreetMap ค้นหาที่อยู่ด้วย Photon (komoot) จากข้อมูล OpenStreetMap</li></ul>`,
   en: `<ul>
     <li>Radar imagery: Copernicus Sentinel-1 (ESA); interferograms and RTC images from ASF HyP3</li>
@@ -507,6 +509,8 @@ const SOURCES = {
     <li>Administrative boundaries: HDX COD-AB (OCHA)</li>
     <li>Ground height: DeltaDTM v1.1 (Pronk et al. 2024); mean sea surface DTU21 MSS; future sea level IPCC AR6 (Fox-Kemper et al. 2021; Garner et al. 2021); water levels from GTSM (Copernicus Climate Change Service); flood model SFINCS (Leijnse et al. 2021, Deltares)</li>
     <li>Comparison flood map: Copernicus Global Flood Monitoring (GFM, CEMS)</li>
+    <li>Ground failure and earthquake damage events: compiled from news reports 2021–2026 (each point's card links to its news story)</li>
+    <li>Citizen reports: Traffy Fondue (public API); only category, date and ticket count are used</li>
     <li>Basemap: OpenFreeMap © OpenMapTiles © OpenStreetMap; address search by Photon (komoot) on OpenStreetMap data</li></ul>`,
 };
 const DOWNLOADS = {
@@ -524,7 +528,8 @@ const ABOUT = {
     <li>ค่าเป็นมิลลิเมตรต่อปี เช่น 15 มม. ต่อปี หมายถึงถ้าทรุดในอัตรานี้ต่อไป 10 ปีจะต่ำลงราว 15 ซม.</li>
     <li>สีบอกความเร็วของการทรุด ไม่ได้บอกว่าอาคารจะเสียหาย ความเสียหายขึ้นกับฐานรากและการทรุดที่ไม่เท่ากันในระยะสั้น ๆ</li>
     <li>ที่ที่ดาวเทียมวัดได้ไม่ชัด เช่น นาข้าว บ่อเลี้ยงสัตว์น้ำ และแหล่งน้ำ (ราว 29% ของพื้นที่ศึกษา) เติมสีด้วยค่าประมาณจากสิ่งปกคลุมดินและจุดวัดรอบ ๆ ให้เต็มสามจังหวัด ปิดได้ที่ช่องใต้แถบสี การ์ดจะบอกว่าค่าไหนเป็นค่าประมาณ</li>
-    <li>สีของอาคารเปลี่ยนตามแถบที่เลือก: อัตราทรุดของพื้นที่รอบอาคาร (ช่องละ 80 ม.), ความลึกน้ำท่วมจากทะเลของฉากทัศน์ที่เลือก (ช่อง 100 ม.) หรือระดับความเสี่ยง (ช่อง 100 ม.) ไม่ได้วัดตัวอาคารแต่ละหลัง</li></ul>
+    <li>สีของอาคารเปลี่ยนตามแถบที่เลือก: อัตราทรุดของพื้นที่รอบอาคาร (ช่องละ 80 ม.), ความลึกน้ำท่วมจากทะเลของฉากทัศน์ที่เลือก (ช่อง 100 ม.) หรือระดับความเสี่ยง (ช่อง 100 ม.) ไม่ได้วัดตัวอาคารแต่ละหลัง</li>
+    <li>ปุ่ม "อาคาร 2 มิติ" แสดงอาคารแบบแบนเมื่อซูมออก ปุ่ม "อาคาร 3 มิติ" แสดงอาคารตามความสูงจริงเมื่อซูมเข้าใกล้ (ระดับซูม 13 ขึ้นไป) ถ้าปิด 3 มิติ อาคารจะแบนทุกระดับซูม</li></ul>
     <h4>การเติมช่องว่าง</h4>
     <p>ช่องที่ดาวเทียมวัดไม่ได้ส่วนใหญ่เป็นบ่อเลี้ยงสัตว์น้ำ นาข้าว และแหล่งน้ำ ซึ่งไม่เหมือนเมืองหรือถนนข้าง ๆ การเฉลี่ยจากจุดวัดรอบ ๆ อย่างเดียว (IDW) จึงยืมค่าจากพื้นที่ที่ทรุดคนละแบบ เราจึงเติมสองชั้น (regression kriging แบบง่าย): (1) แบบจำลอง gradient boosting เรียนอัตราทรุดของช่องที่วัดได้ 336,732 ช่องจากสัดส่วนสิ่งปกคลุมดิน ESA WorldCover 2021 (10 ม.) ในช่องและรอบ ๆ (ราว 0.5 และ 2 กม.) จำนวนอาคาร ประชากร WorldPop 2025 ความสูง DeltaDTM ระยะถึงทะเลและแหล่งน้ำ และตำแหน่ง (แนวโน้มระดับภูมิภาคจากการสูบน้ำบาดาล) (2) ส่วนต่างระหว่างค่าวัดกับแบบจำลองของจุดวัดใกล้ ๆ บวกกลับโดยลดลงตามระยะ (ครึ่งหนึ่งที่ราว 1 กม.) ใกล้จุดวัดค่าจึงต่อกับค่าวัด ไกลออกไปขึ้นกับสิ่งปกคลุมดินเป็นหลัก ทดสอบโดยซ่อนจุดวัดทั้งบล็อก 3 × 3 กม. แล้วประมาณกลับ: คลาดเฉลี่ย 1.7 มม. ต่อปี (IDW 2.0) และในช่องที่เป็นบ่อหรือนาเป็นส่วนใหญ่ 2.9 มม. ต่อปี (IDW 3.3) IDW ประเมินการทรุดในบ่อและนาต่ำไปเฉลี่ย 0.65 มม. ต่อปี วิธีใหม่ไม่เอียง ช่องที่เติมคิดเป็น 29% ของพื้นที่ศึกษา ครึ่งหนึ่งห่างจุดวัดไม่เกิน 220 ม. และ 95% ไม่เกิน 1.6 กม. ค่าเติมไม่ได้ใช้ในตารางสรุปรายเขต การจัดอันดับ และ exposure</p>
     <h4>แผนที่ความเสี่ยง</h4>
@@ -563,7 +568,8 @@ const ABOUT = {
     <li>Values are millimetres per year. 15 mm a year means about 15 cm lower after 10 years if the rate continues.</li>
     <li>Colours show how fast the ground sinks, not whether buildings will be damaged. Damage depends on foundations and on uneven sinking over short distances.</li>
     <li>Spots the satellite cannot measure reliably, such as rice fields, fish ponds and water (about 29% of the study area), are filled with estimates from land cover and nearby measurements so the three provinces are fully covered. Untick the box under the colour bar to hide them; the card says when a value is an estimate.</li>
-    <li>Building colours follow the selected tab: the sinking rate of the surrounding 80 m cell, the sea flooding depth of the selected scenario (100 m cell) or the risk class (100 m cell), not a measurement of each building.</li></ul>
+    <li>Building colours follow the selected tab: the sinking rate of the surrounding 80 m cell, the sea flooding depth of the selected scenario (100 m cell) or the risk class (100 m cell), not a measurement of each building.</li>
+    <li>"Bldg 2D" shows flat footprints when zoomed out; "Bldg 3D" shows buildings at their real height when zoomed in (zoom 13 and closer). With 3D off, buildings stay flat at every zoom.</li></ul>
     <h4>Filling the gaps</h4>
     <p>Most cells the satellite cannot measure are fish ponds, rice fields and water, which behave differently from the towns and roads next to them, so averaging nearby measurements alone (IDW) borrows values from land that sinks differently. The gaps are filled in two layers (a simple regression kriging): (1) a gradient-boosting model learns the sinking rate of the 336,732 measured cells from ESA WorldCover 2021 (10 m) land-cover shares in and around the cell (about 0.5 and 2 km), building count, WorldPop 2025 population, DeltaDTM height, distance to the sea and to water, and position (the regional pattern of groundwater pumping); (2) the difference between measurement and model at nearby measured cells is added back, fading with distance (half at about 1 km), so values join the measurements near them and depend mainly on land cover further away. Hiding whole 3 × 3 km blocks of measurements and estimating them back gives a mean error of 1.7 mm a year (IDW 2.0), and 2.9 mm a year in cells that are mostly ponds or fields (IDW 3.3). IDW underestimates sinking in ponds and fields by 0.65 mm a year on average; the new method shows no bias. Filled cells make up 29% of the study area; half are within 220 m of a measurement and 95% within 1.6 km. Estimates are not used in the district tables, rankings or exposure figures.</p>
     <h4>Risk map</h4>
@@ -708,7 +714,7 @@ async function setTraffy(on) {
   if (on && !trData) {
     try { trData = await fetch('traffy.geojson').then(r => r.json()); } catch (err) { return; }
     trData.features.forEach(f => { trCount[f.properties.c] = (trCount[f.properties.c] || 0) + 1; });
-    map.addSource('pl-tr', { type: 'geojson', data: trData });
+    map.addSource('pl-tr', { type: 'geojson', data: trData, attribution: 'Traffy Fondue' });
     map.addLayer({ id: 'pl-tr', type: 'circle', source: 'pl-tr', paint: {
       'circle-color': ['match', ['get', 'c'], ...Object.entries(TR_COLORS).flat(), '#888888'],
       'circle-radius': ['interpolate', ['linear'], ['zoom'], 9, 2, 13, 3.5, 16, 6], 'circle-opacity': 0.75,
@@ -1201,7 +1207,10 @@ function railOpen(open) {
   $('lrHead').setAttribute('aria-expanded', open); $('lrBody').hidden = !open;
   if (open && small()) $('side').classList.add('hidden');
 }
-railOpen(true);
+railOpen(!small());
+// บนมือถือเปิดมาเห็นหัวเรื่องและคำอธิบายก่อน แตะหรือลากแผนที่แล้วแผงซ้ายพับเก็บ (เปิดใหม่ได้ที่ปุ่มมุมซ้ายบน)
+const foldSide = () => { if (small()) $('side').classList.add('hidden'); };
+map.on('click', foldSide); map.on('dragstart', foldSide);
 $('lrHead').onclick = () => railOpen($('lrBody').hidden);
 document.addEventListener('click', e => { if (!bmCtl.contains(e.target) && bmCtl.classList.contains('open')) { bmCtl.classList.remove('open'); renderBm(); } });
 try { basemap = localStorage.getItem('basemap') || 'light'; } catch (err) { /* ใช้ค่าเริ่มต้น */ }
