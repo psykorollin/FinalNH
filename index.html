@@ -1079,7 +1079,7 @@ const protocol = new pmtiles.Protocol();
 maplibregl.addProtocol('pmtiles', protocol.tile);
 // ไฟล์ข้อมูลของเว็บ (json, bin, png) ต่อท้ายด้วยเลขรุ่น เบราว์เซอร์จะโหลดของใหม่ทันทีหลังอัปเดต ไม่ค้างสีหรือค่าเก่าในแคช
 // เปลี่ยน ASSET_V ทุกครั้งที่อัปโหลดไฟล์ข้อมูลชุดใหม่ (pmtiles ไม่ผ่านตรงนี้ เพราะโหลดเป็นช่วง ๆ ผ่าน pmtiles.js)
-const ASSET_V = '20261115';
+const ASSET_V = '20261126';
 const vurl = u => typeof u !== 'string' || /^[a-z]+:/i.test(u) || u.includes('?') ? u : `${u}?v=${ASSET_V}`;
 const fetch0 = window.fetch.bind(window);
 window.fetch = (u, o) => fetch0(vurl(u), o);
